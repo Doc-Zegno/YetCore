@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YetCoreProject", "YetCoreProject\YetCoreProject.vcxproj", "{B791C66B-EC75-4D6F-B4C8-870CD1F2988C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YetCoreLibrary", "YetCoreLibrary\YetCoreLibrary.vcxproj", "{6689467D-8E11-4A10-991C-2F4777500EEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{B791C66B-EC75-4D6F-B4C8-870CD1F2988C}.Release|x64.Build.0 = Release|x64
 		{B791C66B-EC75-4D6F-B4C8-870CD1F2988C}.Release|x86.ActiveCfg = Release|Win32
 		{B791C66B-EC75-4D6F-B4C8-870CD1F2988C}.Release|x86.Build.0 = Release|Win32
+		{6689467D-8E11-4A10-991C-2F4777500EEC}.Debug|x64.ActiveCfg = Debug|x64
+		{6689467D-8E11-4A10-991C-2F4777500EEC}.Debug|x64.Build.0 = Debug|x64
+		{6689467D-8E11-4A10-991C-2F4777500EEC}.Debug|x86.ActiveCfg = Debug|Win32
+		{6689467D-8E11-4A10-991C-2F4777500EEC}.Debug|x86.Build.0 = Debug|Win32
+		{6689467D-8E11-4A10-991C-2F4777500EEC}.Release|x64.ActiveCfg = Release|x64
+		{6689467D-8E11-4A10-991C-2F4777500EEC}.Release|x64.Build.0 = Release|x64
+		{6689467D-8E11-4A10-991C-2F4777500EEC}.Release|x86.ActiveCfg = Release|Win32
+		{6689467D-8E11-4A10-991C-2F4777500EEC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
