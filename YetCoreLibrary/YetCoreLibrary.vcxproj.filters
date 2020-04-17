@@ -27,6 +27,9 @@
     <ClInclude Include="Include\Module.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Result.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

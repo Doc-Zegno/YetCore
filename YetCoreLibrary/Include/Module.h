@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Api.h"
+#include "Result.h"
 
 extern "C" {
-	YETCORELIBRARY_API const char* yet_Module_path__get();
+	YETCORELIBRARY_API ConstCharResult yet_Module_path__get();
 }

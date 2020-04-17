@@ -7,13 +7,14 @@
 
 static char buffer[BUFFER_SIZE];
 
-const char* yet_Module_path__get() {
+ConstCharResult yet_Module_path__get() {
+    // TODO: error handling
     // TODO: not thread-safe
     // TODO: memoize the result
     auto length = GetModuleFileNameA(nullptr, buffer, BUFFER_SIZE);
     if (length > 0) {
-        return buffer;
+        return okResult(buffer);
     } else {
-        return nullptr;
+        return errorConstCharResult(1);
     }
 }
