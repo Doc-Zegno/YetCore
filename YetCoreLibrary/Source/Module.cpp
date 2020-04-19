@@ -7,7 +7,7 @@
 
 static char buffer[BUFFER_SIZE];
 
-ConstCharResult yet_Module_path__get() {
+ConstCharResult yet_Module_path__get__V() {
     // TODO: error handling
     // TODO: not thread-safe
     // TODO: memoize the result
