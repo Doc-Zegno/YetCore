@@ -146,7 +146,7 @@ In order to address such cases, the following rules are used:
     // Expanded nested (note: two outermost types!)
     Array<Array<Images.Filter>> <=> 2tArray_2tArray_2pImages_Filter
 ```
- 7) Shorthand notation is used for parameter types that have common
+ 7) Shorthand notation is used for parameter/return types that have common
     parts with the full qualification of the method. Replace them with
     a `Nc` mnenomic (`N` common parts):
 ```swift
@@ -155,6 +155,30 @@ In order to address such cases, the following rules are used:
     //   but with a `2c` it becomes `2c.User` and thus has only 2 parts
     MegaApp.Models.Util.createFrom(user: MegaApp.Models.User) <=>
         yet_MegaApp_Models_Util_createFrom__2p2c_User__V()
+```
+ 8) Similar shorthand is used when the common parts are borrowed from
+    previous argument types. In this case a `NcI` mnemonic is used
+    (`N` common parts with argument type #`I`, counting from zero):
+```swift
+    // Arguments share the same type
+    compare(user1: MegaApp.Models.User, user2: MegaApp.Models.User): Int <=>
+        yet_compare__3pMegaApp_Models_User_3c0__I()
+```
+ 9) The more common parts the better. That means, if an argument #1
+    has more common parts with an argument #0 than it has with a method's
+    qualification, it must share them with a previous argument.
+    Otherwise a full qualification (and then arguments with lower indices)
+    gets a higher priority.
+    This rule is applied **before** previous argument's type gets collapsed
+    (in case it has common parts with method's qualification itself):
+```swift
+    // Argument #1 has 2 common parts with a method's qualification
+    // and 3 parts with an argument #0.
+    // Despite the fact the first argument's type gets collapsed to
+    // `2p2c_User`, the second's argument's type still shares
+    // `MegaApp.Models.User` with it and thus turns into `3c0`
+    MegaApp.Models.compare(user1: MegaApp.Models.User, user2: MegaApp.Models.User): Int <=>
+        yet_MegaApp_Models_compare__2p2c_User_3c0__I()
 ```
 
 Now let's try it out:
@@ -202,8 +226,9 @@ can be injected between a method name and a parameter list:
     // Re:Lite
     func ui.Color.darker(): ui.Color
 
-    // Yet. Also note implicit `ui.Color` parameter
-    yet_darker__extension__2pui_Color__2pui_Color
+    // Yet. Also note implicit `ui.Color` parameter.
+    // ... and don't forget about sharing common types
+    yet_darker__extension__2pui_Color__2c0
 ```
 
 #### Type variables
@@ -293,7 +318,7 @@ according to the following rules:
     }
 
     // Yet
-    Result yet_shift__Point_Point__Point(Point* point, Point* offset, Point* result) {
+    Result yet_shift__Point_1c0__1c0(Point* point, Point* offset, Point* result) {
         result->x = point->x + offset->x;
         result->y = point->y + offset->y;
         return okResult();  // inline for `Result{ 0 }`
