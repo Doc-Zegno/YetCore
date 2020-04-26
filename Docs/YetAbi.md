@@ -20,15 +20,15 @@ Consider the example below:
 ```
 This method yields the following name:
 ```
-    yet_CompanyName_ProjectName_Image_save__s_S_S_S
+    yet_CompanyName_ProjectName_Image_save__s_S_S_S__V
 ```
 
 So, as you can see:
  1) Prepend name with a `yet_` prefix
  2) Write down method's full qualification joined with an underscore:
- `CompanyName_ProjectName_Image_save`
+    `CompanyName_ProjectName_Image_save`
  3) Put two underscores in order to separate an argument types' list
- 4) Finally specify types of arguments:
+ 4) Specify types of arguments:
 
 | Letters |  Corresponding type  |
 | ------- | -------------------- |
@@ -45,6 +45,7 @@ So, as you can see:
 | `F`     | `Float`              |
 | `F32`   | `Float32`            |
 | `S`     | `String`             |
+| `PC`    | C-pointer to `Char`  |
 | `R`     | `Any`                |
 | `t1`    | template type #1     |
 | `OI`    | `Optional<Int>`      |
@@ -56,20 +57,25 @@ So, as you can see:
 | `X2IV`  | `Function<Int, Void>`|
 | `J2CB`  | `Variant<Char, Bool>`|
 
+ 5) Put another double underscore and specify a return type as well.
+
 Please, note:
  * `s` is treated as `self` only when it is **the first** character
  * `V` is used when function has no parameters at all (static function):
 ```swift
-    func printNewLine() <=> yet_printNewLine__V
+    func printNewLine() <=> yet_printNewLine__V__V
 ```
  * `Any` is denoted with `R` (for `Ref`)
  * `Iterable` is denoted with `E` and not `I`
    (alternative name is `Enumerable`)
  * `Set` is denoted with `H` (think as of `HashSet`)
  * Template types are **not** translated as is. Instead, they get
-   an ordinal value:
+   an ordinal value. Also they become a part of their owner's name:
 ```swift
-    func find<E, T>(e: E, t: T) <=> yet_find__t1_t2
+    // This one is a bit tricky.
+    // `2tfind_t1_t2` corresponds to `find<E, T>`
+    // (you'll get more information about such a format later).
+    func find<E, T>(e: E, t: T): T? <=> yet_2tfind_t1_t2__t1_t2__Ot2
 ```
  * `Tuple` is followed by a number of its template type arguments:
 ```swift
@@ -121,22 +127,26 @@ In order to address such cases, the following rules are used:
 ```swift
     koalas.DataFrame<Int, String> <=> 3t2pkoalas_DataFrame_I_S
 ```
- 6) Builtin containers are written in the expanded form when used with
+ 6) Builtin template types are written in the expanded form when used with
     non-builtin types:
 ```swift
     // Short
     Array<Int> <=> AI
+    Function<String> <=> X1S
 
     // Short nested
     Array<Array<Int>> <=> AAI
+    Function<Function<String>> <=> X1X1S
 
-    // Expanded
+    // Expanded.
+    // Please, note: `Function` doesn't use this strange `X` anymore
     Array<Images.Filter> <=> 2tArray_2pImages_Filter
+    Function<Images.Filter> <=> 2tFunction_2pImages_Filter
 
     // Expanded nested (note: two outermost types!)
     Array<Array<Images.Filter>> <=> 2tArray_2tArray_2pImages_Filter
 ```
- 7) Shorthand notation can be used for parameter types that have common
+ 7) Shorthand notation is used for parameter types that have common
     parts with the full qualification of the method. Replace them with
     a `Nc` mnenomic (`N` common parts):
 ```swift
@@ -144,13 +154,13 @@ In order to address such cases, the following rules are used:
     // Please, note: `MegaApp.Models.User` actually has 3 parts
     //   but with a `2c` it becomes `2c.User` and thus has only 2 parts
     MegaApp.Models.Util.createFrom(user: MegaApp.Models.User) <=>
-        yet_MegaApp_Models_Util_createFrom__2p2c_User()
+        yet_MegaApp_Models_Util_createFrom__2p2c_User__V()
 ```
 
 Now let's try it out:
 ```swift
     koalas.util.print_header(df: koalas.DataFrame<Int, Array<Images.Filter>>, rows: Int) <=>
-        yet_koalas_util_2wprint_header__3t2p1c_DataFrame_I_2tArray_2pImages_Filter_I()
+        yet_koalas_util_2wprint_header__3t2p1c_DataFrame_I_2tArray_2pImages_Filter_I__V()
 ```
 ~~Still pretty readable~~.
 
@@ -166,26 +176,26 @@ can be injected between a method name and a parameter list:
     }
 
     // Yet (standard prefices are omitted). Also note `self` parameter
-    Widget_isVisible__get__s
-    Widget_isVisible__set__s
+    Widget_isVisible__get__s__B
+    Widget_isVisible__set__s_B__V
 ```
  2) Operators with `operator`:
  ```swift
     // Re:Lite -- invoke
-    operator ()(x: Int)
+    operator ()(x: Int) -> String
 
     // Yet
-    invoke__operator__s_I
+    invoke__operator__s_I__S
 
     // Re:Lite -- subscript
-    operator [](index: Int) {
+    operator [](index: Int) -> Float {
         get { ... }
-        set { ... }
+        set { ... }  // Note: implicit `Float` argument
     }
 
     // Yet
-    get__operator__s
-    set__operator__s_I
+    get__operator__s_I__F
+    set__operator__s_I_F__V
  ```
   3) (Re:Lite special) extensions:
 ```swift
@@ -193,7 +203,7 @@ can be injected between a method name and a parameter list:
     func ui.Color.darker(): ui.Color
 
     // Yet. Also note implicit `ui.Color` parameter
-    yet_darker__extension__2pui_Color
+    yet_darker__extension__2pui_Color__2pui_Color
 ```
 
 #### Type variables
@@ -228,7 +238,7 @@ The following rules are used:
 ```swift
     func setResolution(value: Int?)
     <=>
-    yet_setResolution__OI(Int* value)
+    yet_setResolution__OI__V(Int* value)
 ```
  5) The most nested `Optional<T>` where `T` is a referential type is reduced
     to a `Ptr` which can be `0`
@@ -242,7 +252,7 @@ The inner most optional is wrapped around the referential type `Any` thus gets r
 C-pointer:
 ```swift
     // Don't forget about mangling
-    yet_pass__OOOR(Optional<Ptr>* value)
+    yet_pass__OOOR__V(Optional<Ptr>* value)
 ```
 
 #### Retrieving the results of invocation and error checking for static functions
@@ -283,7 +293,7 @@ according to the following rules:
     }
 
     // Yet
-    Result yet_shift__Point_Point(Point* point, Point* offset, Point* result) {
+    Result yet_shift__Point_Point__Point(Point* point, Point* offset, Point* result) {
         result->x = point->x + offset->x;
         result->y = point->y + offset->y;
         return okResult();  // inline for `Result{ 0 }`
