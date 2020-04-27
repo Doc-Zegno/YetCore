@@ -157,7 +157,9 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="Include\Api.h" />
+    <ClInclude Include="Include\BasicArray.h" />
     <ClInclude Include="Include\Module.h" />
+    <ClInclude Include="Include\Ptr.h" />
     <ClInclude Include="Include\Result.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>

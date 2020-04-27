@@ -1,16 +1,44 @@
 #pragma once
 
-#include <cstdint>
+#include "Ptr.h"
+
+struct VoidResult {
+	Ptr error;
+};
 
 struct ConstCharResult {
 	const char* value;
-	uintptr_t error;
+	Ptr error;
 };
 
-inline ConstCharResult okResult(const char* value) {
-	return ConstCharResult{ value };
+template<typename V>
+struct Result {
+	V value;
+	Ptr error;
+};
+
+inline VoidResult okResult() {
+	return VoidResult{ 0 };
 }
 
-inline ConstCharResult errorConstCharResult(uintptr_t error) {
+inline VoidResult errorVoidResult(Ptr error) {
+	return VoidResult{ error };
+}
+
+inline ConstCharResult okResult(const char* value) {
+	return ConstCharResult{ value, 0 };
+}
+
+inline ConstCharResult errorConstCharResult(Ptr error) {
 	return ConstCharResult{ nullptr, error };
+}
+
+template<typename V>
+inline Result<V> okGenericResult(V value) {
+	return Result<V>{ value, 0 };
+}
+
+template<typename V>
+inline Result<V> errorGenericResult(Ptr error) {
+	return Result<V>{ V(), error };
 }
