@@ -156,11 +156,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Include\Any.h" />
     <ClInclude Include="Include\Api.h" />
     <ClInclude Include="Include\BasicArray.h" />
+    <ClInclude Include="Include\Manageable.h" />
     <ClInclude Include="Include\Module.h" />
     <ClInclude Include="Include\Ptr.h" />
     <ClInclude Include="Include\Result.h" />
+    <ClInclude Include="Include\Type.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +174,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Any.cpp" />
     <ClCompile Include="Source\Module.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

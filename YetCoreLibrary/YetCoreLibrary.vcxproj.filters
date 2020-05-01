@@ -36,6 +36,15 @@
     <ClInclude Include="Include\BasicArray.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Manageable.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Any.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Type.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -45,6 +54,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Module.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Any.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

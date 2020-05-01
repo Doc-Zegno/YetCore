@@ -375,3 +375,59 @@ for returning an invocation result. Instead, **every resulting value**
 is returned as is wrapped with `Result<T>`. The only notable exception is
 for the referential values which are still returned as `Ptr` instances
 via `Result<Ptr>`.
+
+
+### Object's memory layout
+Every object that wants to be *understood* by a Yet Runtime must have
+a predefined memory layout:
+ 1) The first machine word (8 bytes on a 64-bit machine) is occupied by
+    an instance of `Manageable` (which is a special struct that is
+    responsible for storing both strong and weak reference counts)
+ 2) The second one is occupied by a C-pointer to an instance of
+    `Type` structure and provides necessary type information at runtime
+    (most importantly, virtual tables)
+ 3) If its class `D` is derived from some other `B`, it must
+    contain data (typically, fields) of that class. Effectively,
+    first words of `D` layout must resemble the ones of `B` so
+    a C-pointer to `D` instance can be treated as a pointer to `B`
+    without any adjustments
+ 4) The following space is up to its owner and usually is filled with
+    object's fields.
+
+For 64-bit platforms it is also required that object is aligned
+at a **16-byte boundary** so the lowest 4 bits of C-pointer to this object
+are guaranteed to be set to zero.
+
+**Please, note:** such a layout is pretty rigid and leaves no opportunity
+of implementing multiple inheritance without a severe headache.
+On the other hand, there is no problem with implementation of multiple
+interfaces since all the virtual tables are just stacked within
+corresponding `Type` variable (more in the following sections).
+
+
+### Virtual invocations machinery
+Yet **doesn't** use C++ mechanism for virtual method calls since it has
+some sad limitations:
+ * Strange rules for return type covariance that don't allow you
+   to return, say, `Int` from the implementation of some interface
+   which requires `Optional<Int>` to be returned
+ * A big mess of `vtable` pointers that leads to unpredictable object's
+   memory layout and (more importantly) makes a compiler perform some
+   pointer adjustments during upcasting.
+
+The latter is the absolute pitfall which makes it impossible to support
+co/contravariance for generic types. That is, you can't safely pass
+an object of type `Array<String>` to a function expecting argument
+of type `Iterable<Any>` without some kind of adapters/wrappers
+that will perform necessary pointer adjustments for array's elements.
+
+#### Utilized scheme
+So actually Yet uses a model very close to a Java one. Effectively
+you just pass some `Ptr`/`Ref` around without knowing its corresponding
+type at all. It's totally safe since all the objects have a predictable
+memory layout with a pointer to a `Type` instance placed at 2nd machine
+word. So when it comes to using methods from `String` interface,
+you're looking through the virtual tables of the object this `Ptr` points to
+and trying to find an appropriate one. When it's found, just invoke
+a function at the offset known at compile-time. Dead simple.
+

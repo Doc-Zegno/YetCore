@@ -2,10 +2,12 @@
 
 #include <vector>
 
+#include "Any.h"
 #include "Result.h"
 
 template<typename E>
 struct BasicArray {
+	Any __base;
 	std::vector<E> _elements;
 
 	static VoidResult add__s_t1__V(Ptr self, E element) {
@@ -23,4 +25,36 @@ struct BasicArray {
 			return errorGenericResult<E>(1);
 		}
 	}
+
+	static VoidResult __deinit(Ptr self) {
+		auto basicArray = (BasicArray<E>*)self;
+		basicArray->~BasicArray<E>();
+		return okResult();
+	}
+
+	struct __TypeHolder {
+		FunctionPtr _ptrs[1] = {
+			&__deinit,
+		};
+
+		VirtualTable _tables[1] = {
+			VirtualTable{ &yet_Any__type, _ptrs, 1 },
+		};
+
+		Type type{
+			_tables,
+			1,
+			"Builtin.BasicArray",
+		};
+	};
+
+	static __TypeHolder __typeHolder;
+};
+
+template<typename E>
+typename BasicArray<E>::__TypeHolder BasicArray<E>::__typeHolder{};
+
+template<typename E>
+struct TypeOf<BasicArray<E>> {
+	Type* value = &BasicArray<E>::__typeHolder.type;
 };
