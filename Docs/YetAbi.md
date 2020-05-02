@@ -377,6 +377,50 @@ for the referential values which are still returned as `Ptr` instances
 via `Result<Ptr>`.
 
 
+### Memory management
+Yet Runtime uses a custom memory manager which aims to optimize
+frequent allocations and deallocations of object of particular
+granularity (16 bytes for 64-bit machines).
+
+Since Yet is all about OOP, classes and interfaces, typical programs
+will allocate quite a lot (usually rather small) objects. All of them
+should be automatically deallocated once they aren't in use anymore.
+This is done via *automatic reference counters* and thus brings some
+old problems (e.g. *cyclic references*) here which can be solved with
+the help of weak references.
+
+Keep in mind that weak references must be automatically zeroed when
+an object is deallocated and, even better, actually some of the allocated objects might **not** be allocated on a heap (in order to improve
+a performance).
+That means the memory management system is not trivial and you must
+**never** operate on reference counter's internals. Instead,
+you should use (preferred) C++ class `Ref` for automatic reference
+counting and `retain()`/`release()` for manual counter increase/decrease
+(correspondingly).
+
+Typically, you're advised to use the simplest version of builtin allocation
+methods (i.e. the version with one argument). The more advanced ones
+are used for optimization purposes only and very risky if you don't know
+when it's safe to enable such an optimization (consider reading
+a dedicated section below).
+
+#### Stack allocation
+One of the main problems is a reduction of unnecessary memory allocations
+on a process' heap since they're rather expensive. Actually there are
+lots of situations when allocated objects are used just like they were
+local variables (collections' iterators is a good example). You can say
+this about your object in case it meets
+the following requirements:
+ 1) You don't pass it to an outer scope (e.g. you don't return it
+    from a function)
+ 2) One of the following is true:
+    * you either don't pass it as function argument at all
+    * or corresponding function argument is marked as local itself.
+
+If you have managed to prove your object is local, it can be allocated
+*on stack* with a dedicated allocator's method.
+
+
 ### Object's memory layout
 Every object that wants to be *understood* by a Yet Runtime must have
 a predefined memory layout:

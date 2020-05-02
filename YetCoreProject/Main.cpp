@@ -3,7 +3,16 @@
 
 #include "Any.h"
 #include "Module.h"
+#include "Allocator.h"
 #include "BasicArray.h"
+
+void* operator new(size_t size) {
+    return yet_allocate__U_B_B__PV((uintptr_t)size, false, false);
+}
+
+void operator delete(void* object) {
+    yet_deallocate__PV__B(object);
+}
 
 void demoModulePath() {
     auto result = yet_Module_path__get__V__PC8();
@@ -17,6 +26,7 @@ void demoModulePath() {
 void demoBasicArray() {
     BasicArray<int> basicArray{};
     auto ptr = Ptr(&basicArray);
+    std::cout << "Num allocated: " << yet_allocatedCount__get__V__I() << std::endl;
     BasicArray<int>::add__s_t1__V(ptr, 42);
     BasicArray<int>::add__s_t1__V(ptr, 137);
     std::cout << "Element #0: " << BasicArray<int>::get__operator__s_I__t1(ptr, 0).value << std::endl;
@@ -32,6 +42,7 @@ void demoBasicArray() {
             auto casted = (VoidResult(*)(Ptr))function;
             casted(ptr);
             std::cout << "Deinitialized array\n";
+            std::cout << "Num allocated: " << yet_allocatedCount__get__V__I() << std::endl;
             std::cout << "Element #0: error? -> " << BasicArray<int>::get__operator__s_I__t1(ptr, 0).error << std::endl;
         }
     }
@@ -42,4 +53,5 @@ int main() {
     demoBasicArray();
     std::cout << "Any name: " << typeOf<Any>()->name << std::endl;
     std::cout << "Array name: " << BasicArray<int>::__typeHolder.type.name << std::endl;
+    std::cout << "Num allocated on exit: " << yet_allocatedCount__get__V__I() << std::endl;
 }
