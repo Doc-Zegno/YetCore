@@ -48,6 +48,9 @@
     <ClInclude Include="Include\Allocator.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\PtrX.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -163,6 +163,7 @@
     <ClInclude Include="Include\Manageable.h" />
     <ClInclude Include="Include\Module.h" />
     <ClInclude Include="Include\Ptr.h" />
+    <ClInclude Include="Include\PtrX.h" />
     <ClInclude Include="Include\Result.h" />
     <ClInclude Include="Include\Type.h" />
     <ClInclude Include="pch.h" />

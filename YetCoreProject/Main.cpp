@@ -2,6 +2,7 @@
 #include <type_traits>
 
 #include "Any.h"
+#include "PtrX.h"
 #include "Module.h"
 #include "Allocator.h"
 #include "BasicArray.h"
@@ -26,6 +27,7 @@ void demoModulePath() {
 void demoBasicArray() {
     BasicArray<int> basicArray{};
     auto ptr = Ptr(&basicArray);
+    BasicArray<int>::__init__PV__V(&basicArray);
     std::cout << "Num allocated: " << yet_allocatedCount__get__V__I() << std::endl;
     BasicArray<int>::add__s_t1__V(ptr, 42);
     BasicArray<int>::add__s_t1__V(ptr, 137);
@@ -33,18 +35,15 @@ void demoBasicArray() {
     std::cout << "Element #1: " << BasicArray<int>::get__operator__s_I__t1(ptr, 1).value << std::endl;
     std::cout << "Element #2: error? -> " << BasicArray<int>::get__operator__s_I__t1(ptr, 2).error << std::endl;
 
-    auto type = typeOf<BasicArray<int>>();
-    for (auto i = 0; i < type->tableCount; i++) {
-        auto& table = type->tables[i];
-        if (table.type == &yet_Any__type) {
-            std::cout << "Found Any table at address: " << table.type << std::endl;
-            auto function = table.ptrs[int(Any::__Methods::__deinit)];
-            auto casted = (VoidResult(*)(Ptr))function;
-            casted(ptr);
-            std::cout << "Deinitialized array\n";
-            std::cout << "Num allocated: " << yet_allocatedCount__get__V__I() << std::endl;
-            std::cout << "Element #0: error? -> " << BasicArray<int>::get__operator__s_I__t1(ptr, 0).error << std::endl;
-        }
+    auto table = findTableOf<Any>(ptr);
+    if (table->type == &yet_Any__type) {
+        std::cout << "Found Any table at address: " << table->type << std::endl;
+        auto function = table->ptrs[int(Any::__Methods::__deinit)];
+        auto casted = (VoidResult(*)(Ptr))function;
+        casted(ptr);
+        std::cout << "Deinitialized array\n";
+        std::cout << "Num allocated: " << yet_allocatedCount__get__V__I() << std::endl;
+        std::cout << "Element #0: error? -> " << BasicArray<int>::get__operator__s_I__t1(ptr, 0).error << std::endl;
     }
 }
 

@@ -16,6 +16,16 @@ struct Type {
 	VirtualTable* tables;
 	intptr_t tableCount;
 	const char* name;
+
+	VirtualTable* findTableOf(Type* type) {
+		for (auto i = 0; i < tableCount; i++) {
+			auto table = &tables[i];
+			if (table->type == type) {
+				return table;
+			}
+		}
+		return nullptr;
+	}
 };
 
 template<typename T>

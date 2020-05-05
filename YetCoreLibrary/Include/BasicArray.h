@@ -26,6 +26,12 @@ struct BasicArray {
 		}
 	}
 
+	static VoidResult __init__PV__V(void* object) {
+		auto any = (Any*)object;
+		any->__type = &__typeHolder.type;
+		return okResult();
+	}
+
 	static VoidResult __deinit(Ptr self) {
 		auto basicArray = (BasicArray<E>*)self;
 		basicArray->~BasicArray<E>();
