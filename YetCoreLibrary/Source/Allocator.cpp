@@ -10,7 +10,7 @@ namespace {
 void* yet_allocate__U_B_B__PV(uintptr_t size, bool isManageable, bool canUseStack) {
 	// TODO: implement path when stack placement is used
 	// TODO: use custom memory manager
-	auto p = malloc((size_t)size);
+	auto p = calloc(1, (size_t)size);
 	if (p) {
 		if (isManageable) {
 			auto manageable = (Manageable*)p;

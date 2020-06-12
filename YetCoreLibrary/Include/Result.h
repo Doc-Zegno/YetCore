@@ -11,6 +11,11 @@ struct ConstCharResult {
 	Ptr error;
 };
 
+struct PtrResult {
+	Ptr value;
+	Ptr error;
+};
+
 template<typename V>
 struct Result {
 	V value;
@@ -31,6 +36,14 @@ inline ConstCharResult okResult(const char* value) {
 
 inline ConstCharResult errorConstCharResult(Ptr error) {
 	return ConstCharResult{ nullptr, error };
+}
+
+inline PtrResult okResult(Ptr value) {
+	return PtrResult{ value, 0 };
+}
+
+inline PtrResult errorPtrResult(Ptr error) {
+	return PtrResult{ 0, error };
 }
 
 template<typename V>

@@ -179,6 +179,7 @@
     <ClCompile Include="Source\Allocator.cpp" />
     <ClCompile Include="Source\Any.cpp" />
     <ClCompile Include="Source\Module.cpp" />
+    <ClCompile Include="Source\PtrX.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

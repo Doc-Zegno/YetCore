@@ -4,6 +4,7 @@
 
 #include "Any.h"
 #include "Result.h"
+#include "Allocator.h"
 
 template<typename E>
 struct BasicArray {
@@ -30,6 +31,21 @@ struct BasicArray {
 		auto any = (Any*)object;
 		any->__type = &__typeHolder.type;
 		return okResult();
+	}
+
+	static PtrResult __new__V__s() {
+		auto place = yet_allocate__U__PV(sizeof(BasicArray<E>));
+		if (place) {
+			auto result = __init__PV__V(place);
+			if (!result.error) {
+				return okResult(Ptr(place));
+			} else {
+				return errorPtrResult(result.error);
+			}
+		} else {
+			// TODO: return out of memory error message
+			return errorPtrResult(1);
+		}
 	}
 
 	static VoidResult __deinit(Ptr self) {

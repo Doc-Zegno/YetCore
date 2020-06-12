@@ -68,5 +68,8 @@
     <ClCompile Include="Source\Allocator.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\PtrX.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
