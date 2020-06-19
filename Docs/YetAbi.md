@@ -250,6 +250,87 @@ for virtual method invocation mechanism. Such variables have special suffix
 This section describes how to properly pass parameters, get a result
 and check for errors.
 
+#### Execution context
+Technically, there is no portable way to reconstruct current execution
+state from the perspective of high-level programming language.
+
+Even if we are trying to inspect current stack trace, its structure and
+the obtained function symbols may have nothing in common with the original
+source code due to several factors:
+ 1) You have to provide symbol tables in order to get something
+    *meaningful* and not just a bunch of useless hex addresses.
+    How often do you specify `-G` flag when compiling your code?
+ 2) You can get *a faulted line* but usually you are really looking
+    for *a faulted expression* which can be spread across multiple lines
+    or, to make things worse, there can be multiple similar expressions
+    on the same line:
+```swift
+    // One of these `calc`s has failed. Good luck with it
+    let x = calc(a) + calc(b) + calc(c)
+```
+ 3) A compiler can (and actually will) optimize out a significant amount
+    of function invocations thus making resulting stack trace useless
+ 4) On the other hand, there are lots of small utility functions which
+    are not exposed to the programmer (usually) so it makes no sense
+    to show them in a stack trace
+ 5) (Probably, the most difficult one) The asynchronous programming is
+    a real beast. Technically, when you schedule some task, it may be
+    executed on a different thread so the previous stack trace becomes
+    *forgotten*:
+```swift
+    func updateUI() {
+        Task.run(&faulty)  // launches a separate thread
+    }
+
+    func faulty() {
+        raise DemoError()
+    }
+
+    // May result in:
+    //   at EventDispatcher.run(Task)
+    //   at Task.invoke()
+    //   at faulty()
+    //
+    // But where is my `updateUI()`? And what is this `EventDispatcher`
+    // doing here?
+```
+
+In order to overcome these limitations, Yet runtime dynamically captures
+current execution state with the help of `StackFrame` and `ExecutionContext`
+instances. Although this process is manual, the things are pretty simple:
+ 1) Almost all of the Yet functions (except for some internal subroutines
+    like `retain()` and `release()`) expect their first argument to be
+    a C-pointer to the current `ExecutionContext` (`EC` for short).
+    But you can pass `nullptr` if you don't have it 
+ 2) Every function which wants to be shown in a stack trace **must**
+    create an instance of `StackFrame` at its very beginning and capture
+    current context:
+```cpp
+    void someFunction(EC* context, args...) {
+        StackFrame frame(context, functionInfo);
+    }
+```
+ 3) If provided `context` pointer is set to `nullptr`, created `StackFrame`
+    will find an appropriate context on its own. So the original `context`
+    pointer will always point to a valid context after that:
+```cpp
+    void someFunction(EC* context, args...) {  // Might be null
+        StackFrame frame(context, functionInfo);
+        context;  // Guaranteed not to be null
+    }
+```
+ 4) You may want to provide extra information by storing the location
+    of expression to be executed before actual invocation:
+```cpp
+    // When manually written in C++
+    frame.setLineAfter(__LINE__);
+    auto result = someFunction(context, args...);
+
+    // When transpiled from Re:Lite or some other language
+    frame.setLocation(...);
+    auto result = someFunction(context, args...);
+```
+
 #### Parameter passing
 The following rules are used:
  1) Scalar primitives (i.e. `Bool`, `Char`, `IntN`, `UIntN` and `FloatN`)

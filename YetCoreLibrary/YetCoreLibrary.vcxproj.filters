@@ -51,6 +51,15 @@
     <ClInclude Include="Include\PtrX.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\ExecutionContext.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\StackFrame.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ExpressionLocation.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -69,6 +78,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\PtrX.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ExecutionContext.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

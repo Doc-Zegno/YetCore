@@ -160,11 +160,14 @@
     <ClInclude Include="Include\Any.h" />
     <ClInclude Include="Include\Api.h" />
     <ClInclude Include="Include\BasicArray.h" />
+    <ClInclude Include="Include\ExecutionContext.h" />
+    <ClInclude Include="Include\ExpressionLocation.h" />
     <ClInclude Include="Include\Manageable.h" />
     <ClInclude Include="Include\Module.h" />
     <ClInclude Include="Include\Ptr.h" />
     <ClInclude Include="Include\PtrX.h" />
     <ClInclude Include="Include\Result.h" />
+    <ClInclude Include="Include\StackFrame.h" />
     <ClInclude Include="Include\Type.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -178,6 +181,7 @@
     </ClCompile>
     <ClCompile Include="Source\Allocator.cpp" />
     <ClCompile Include="Source\Any.cpp" />
+    <ClCompile Include="Source\ExecutionContext.cpp" />
     <ClCompile Include="Source\Module.cpp" />
     <ClCompile Include="Source\PtrX.cpp" />
   </ItemGroup>

@@ -11,13 +11,13 @@ struct BasicArray {
 	Any __base;
 	std::vector<E> _elements;
 
-	static VoidResult add__s_t1__V(Ptr self, E element) {
+	static VoidResult add__s_t1__V(EC* context, Ptr self, E element) {
 		auto basicArray = (BasicArray<E>*)self;
 		basicArray->_elements.push_back(element);
 		return okResult();
 	}
 
-	static Result<E> get__operator__s_I__t1(Ptr self, int index) {
+	static Result<E> get__operator__s_I__t1(EC* context, Ptr self, int index) {
 		auto basicArray = (BasicArray<E>*)self;
 		auto& elements = basicArray->_elements;
 		if (index >= 0 && index < int(elements.size())) {
@@ -27,16 +27,16 @@ struct BasicArray {
 		}
 	}
 
-	static VoidResult __init__PV__V(void* object) {
+	static VoidResult __init__PV__V(EC* context, void* object) {
 		auto any = (Any*)object;
 		any->__type = &__typeHolder.type;
 		return okResult();
 	}
 
-	static PtrResult __new__V__s() {
+	static PtrResult __new__V__s(EC* context) {
 		auto place = yet_allocate__U__PV(sizeof(BasicArray<E>));
 		if (place) {
-			auto result = __init__PV__V(place);
+			auto result = __init__PV__V(context, place);
 			if (!result.error) {
 				return okResult(Ptr(place));
 			} else {

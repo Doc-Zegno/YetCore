@@ -3,6 +3,7 @@
 #include "Api.h"
 #include "Type.h"
 #include "Manageable.h"
+#include "StackFrame.h"
 
 /// <summary>
 /// A base for all classes conforming Yet virtual method invocation scheme
