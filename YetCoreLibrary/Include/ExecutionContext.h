@@ -16,5 +16,5 @@ struct ExecutionContext {
 using EC = ExecutionContext;
 
 extern "C" {
-	YETCORELIBRARY_API ExecutionContext* yet_ExecutionContext_current__get__V__PV();
+	YETCORELIBRARY_API ExecutionContext* yet_ExecutionContext_currentR__get__V__PV();
 }

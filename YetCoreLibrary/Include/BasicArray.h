@@ -11,13 +11,13 @@ struct BasicArray {
 	Any __base;
 	std::vector<E> _elements;
 
-	static VoidResult add__s_t1__V(EC* context, Ptr self, E element) {
+	static VoidResult addP__s_t1__V(EC* context, Ptr self, E element) {
 		auto basicArray = (BasicArray<E>*)self;
 		basicArray->_elements.push_back(element);
 		return okResult();
 	}
 
-	static Result<E> get__operator__s_I__t1(EC* context, Ptr self, int index) {
+	static Result<E> getF__operator__s_I__t1(EC* context, Ptr self, int index) {
 		auto basicArray = (BasicArray<E>*)self;
 		auto& elements = basicArray->_elements;
 		if (index >= 0 && index < int(elements.size())) {
@@ -34,24 +34,18 @@ struct BasicArray {
 	}
 
 	static PtrResult __new__V__s(EC* context) {
-		auto place = yet_allocate__U__PV(sizeof(BasicArray<E>));
-		if (place) {
-			auto result = __init__PV__V(context, place);
-			if (!result.error) {
-				return okResult(Ptr(place));
-			} else {
-				return errorPtrResult(result.error);
-			}
+		auto place = yet_allocateR__U__PV(sizeof(BasicArray<E>));
+		auto result = __init__PV__V(context, place);
+		if (!result.error) {
+			return okResult(Ptr(place));
 		} else {
-			// TODO: return out of memory error message
-			return errorPtrResult(1);
+			return errorPtrResult(result.error);
 		}
 	}
 
-	static VoidResult __deinit(Ptr self) {
+	static void __deinit(Ptr self) {
 		auto basicArray = (BasicArray<E>*)self;
 		basicArray->~BasicArray<E>();
-		return okResult();
 	}
 
 	struct __TypeHolder {

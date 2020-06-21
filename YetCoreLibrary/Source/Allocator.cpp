@@ -7,7 +7,7 @@ namespace {
 	std::atomic<intptr_t> allocatedCount = 0;
 }
 
-void* yet_allocate__U_B_B__PV(uintptr_t size, bool isManageable, bool canUseStack) {
+void* yet_allocateR__U_B_B__PV(uintptr_t size, bool isManageable, bool canUseStack) {
 	// TODO: implement path when stack placement is used
 	// TODO: use custom memory manager
 	auto p = calloc(1, (size_t)size);
@@ -21,19 +21,18 @@ void* yet_allocate__U_B_B__PV(uintptr_t size, bool isManageable, bool canUseStac
 	return p;
 }
 
-void* yet_allocate__U__PV(uintptr_t size) {
-	return yet_allocate__U_B_B__PV(size, true, false);
+void* yet_allocateR__U__PV(uintptr_t size) {
+	return yet_allocateR__U_B_B__PV(size, true, false);
 }
 
-bool yet_deallocate__PV__B(void* object) {
-	// TODO: use custom memory manager. Return `false` on failure
+void yet_deallocateR__PV__V(void* object) {
+	// TODO: use custom memory manager
 	if (object) {
 		free(object);
 		allocatedCount--;
 	}
-	return true;
 }
 
-intptr_t yet_allocatedCount__get__V__I() {
+intptr_t yet_allocatedCountR__get__V__I() {
 	return allocatedCount;
 }

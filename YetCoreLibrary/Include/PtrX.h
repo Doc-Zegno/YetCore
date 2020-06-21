@@ -15,14 +15,14 @@ inline VirtualTable* findTableOf(Ptr object) {
 }
 
 extern "C" {
-	YETCORELIBRARY_API void yet_Ptr_retain__s__V(Ptr object);
-	YETCORELIBRARY_API void yet_Ptr_release__s__V(Ptr object);
+	YETCORELIBRARY_API void yet_Ptr_retainR__s__V(Ptr object);
+	YETCORELIBRARY_API void yet_Ptr_releaseR__s__V(Ptr object);
 }
 
 inline void retain(Ptr object) {
-	yet_Ptr_retain__s__V(object);
+	yet_Ptr_retainR__s__V(object);
 }
 
 inline void release(Ptr object) {
-	yet_Ptr_release__s__V(object);
+	yet_Ptr_releaseR__s__V(object);
 }
