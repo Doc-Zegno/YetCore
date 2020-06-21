@@ -20,15 +20,25 @@ Consider the example below:
 ```
 This method yields the following name:
 ```
-    yet_CompanyName_ProjectName_Image_save__s_S_S_S__V
+    yet_CompanyName_ProjectName_Image_saveP__s_S_S_S__V
 ```
 
 So, as you can see:
  1) Prepend name with a `yet_` prefix
  2) Write down method's full qualification joined with an underscore:
     `CompanyName_ProjectName_Image_save`
- 3) Put two underscores in order to separate an argument types' list
- 4) Specify types of arguments:
+ 3) Specify method's calling convention, typically it's either `F` or `P`
+    (for more details see a dedicated section on method invocations):
+
+| Letters | Convention |
+| ------- | ---------- |
+| `F`     | Function   |
+| `P`     | Procedure  |
+| `R`     | Reduced    |
+| `D`     | Dynamic    |
+
+ 4) Put two underscores in order to separate an argument types' list
+ 5) Specify types of arguments:
 
 | Letters |  Corresponding type  |
 | ------- | -------------------- |
@@ -63,7 +73,7 @@ Please, note:
  * `s` is treated as `self` only when it is **the first** character
  * `V` is used when function has no parameters at all (static function):
 ```swift
-    func printNewLine() <=> yet_printNewLine__V__V
+    func printNewLine() <=> yet_printNewLineP__V__V
 ```
  * `Any` is denoted with `R` (for `Ref`)
  * `Iterable` is denoted with `E` and not `I`
@@ -73,9 +83,9 @@ Please, note:
    an ordinal value. Also they become a part of their owner's name:
 ```swift
     // This one is a bit tricky.
-    // `2tfind_t1_t2` corresponds to `find<E, T>`
+    // `2tfindF_t1_t2` corresponds to `find<E, T>`
     // (you'll get more information about such a format later).
-    func find<E, T>(e: E, t: T): T? <=> yet_2tfind_t1_t2__t1_t2__Ot2
+    func find<E, T>(e: E, t: T): T? <=> yet_2tfindF_t1_t2__t1_t2__Ot2
 ```
  * `Tuple` is followed by a number of its template type arguments:
 ```swift
@@ -124,7 +134,7 @@ In order to address such cases, the following rules are used:
 
     // Technically, the same stay true for template function names
     func find<E, T>(e: E, t: T): T? <=>
-        yet_2tfind_t1_t2__t1_t2__Ot2()
+        yet_2tfindF_t1_t2__t1_t2__Ot2()
 ```
  5) All the prefices are applied in **the reversed order** (so prefix #4
     goes before prefix #3):
@@ -158,7 +168,7 @@ In order to address such cases, the following rules are used:
     // Please, note: `MegaApp.Models.User` actually has 3 parts
     //   but with a `2c` it becomes `2c.User` and thus has only 2 parts
     MegaApp.Models.Util.createFrom(user: MegaApp.Models.User) <=>
-        yet_MegaApp_Models_Util_createFrom__2p2c_User__V()
+        yet_MegaApp_Models_Util_createFromP__2p2c_User__V()
 ```
  8) Similar shorthand is used when the common parts are borrowed from
     previous argument types. In this case a `NcI` mnemonic is used
@@ -166,7 +176,7 @@ In order to address such cases, the following rules are used:
 ```swift
     // Arguments share the same type
     compare(user1: MegaApp.Models.User, user2: MegaApp.Models.User): Int <=>
-        yet_compare__3pMegaApp_Models_User_3c0__I()
+        yet_compareF__3pMegaApp_Models_User_3c0__I()
 ```
  9) The more common parts the better. That means, if an argument #1
     has more common parts with an argument #0 than it has with a method's
@@ -182,13 +192,13 @@ In order to address such cases, the following rules are used:
     // `2p2c_User`, the second's argument's type still shares
     // `MegaApp.Models.User` with it and thus turns into `3c0`
     MegaApp.Models.compare(user1: MegaApp.Models.User, user2: MegaApp.Models.User): Int <=>
-        yet_MegaApp_Models_compare__2p2c_User_3c0__I()
+        yet_MegaApp_Models_compareF__2p2c_User_3c0__I()
 ```
 
 Now let's try it out:
 ```swift
     koalas.util.print_header(df: koalas.DataFrame<Int, Array<Images.Filter>>, rows: Int) <=>
-        yet_koalas_util_2wprint_header__2t2p1c_DataFrame_I_1tArray_2pImages_Filter_I__V()
+        yet_koalas_util_2wprint_headerP__2t2p1c_DataFrame_I_1tArray_2pImages_Filter_I__V()
 ```
 ~~Still pretty readable~~.
 
@@ -204,8 +214,8 @@ can be injected between a method name and a parameter list:
     }
 
     // Yet (standard prefices are omitted). Also note `self` parameter
-    Widget_isVisible__get__s__B
-    Widget_isVisible__set__s_B__V
+    Widget_isVisibleF__get__s__B
+    Widget_isVisibleP__set__s_B__V
 ```
  2) Operators with `operator`:
  ```swift
@@ -213,7 +223,7 @@ can be injected between a method name and a parameter list:
     operator ()(x: Int) -> String
 
     // Yet
-    invoke__operator__s_I__S
+    invokeF__operator__s_I__S
 
     // Re:Lite -- subscript
     operator [](index: Int) -> Float {
@@ -222,8 +232,8 @@ can be injected between a method name and a parameter list:
     }
 
     // Yet
-    get__operator__s_I__F
-    set__operator__s_I_F__V
+    getF__operator__s_I__F
+    setP__operator__s_I_F__V
  ```
   3) (Re:Lite special) extensions:
 ```swift
@@ -232,7 +242,7 @@ can be injected between a method name and a parameter list:
 
     // Yet. Also note implicit `ui.Color` parameter.
     // ... and don't forget about sharing common types
-    yet_darker__extension__2pui_Color__2c0
+    yet_darkerF__extension__2pui_Color__2c0
 ```
 
 #### Type variables
@@ -241,7 +251,8 @@ which can be retrieved at runtime. Most importantly, they contain tables
 for virtual method invocation mechanism. Such variables have special suffix
 `type`:
 ```swift
-    // Type variable for the class `Images.Filter`
+    // Type variable for the class `Images.Filter`.
+    // Doesn't contain "F" since it's not a function
     yet_Images_Filter__type
 ```
 
@@ -298,10 +309,10 @@ source code due to several factors:
 In order to overcome these limitations, Yet runtime dynamically captures
 current execution state with the help of `StackFrame` and `ExecutionContext`
 instances. Although this process is manual, the things are pretty simple:
- 1) Almost all of the Yet functions (except for some internal subroutines
-    like `retain()` and `release()`) expect their first argument to be
-    a C-pointer to the current `ExecutionContext` (`EC` for short).
-    But you can pass `nullptr` if you don't have it 
+ 1) All the Yet functions (except for the ones with **reduced** calling
+    convention) expect their first argument to be a C-pointer to the current
+    `ExecutionContext` (`EC` for short). But you can pass `nullptr`
+    if you don't have it
  2) Every function which wants to be shown in a stack trace **must**
     create an instance of `StackFrame` at its very beginning and capture
     current context:
@@ -348,7 +359,7 @@ The following rules are used:
 ```swift
     func setResolution(value: Int?)
     <=>
-    yet_setResolution__OI__V(Int* value)
+    yet_setResolutionP__OI__V(EC* context, Int* value)
 ```
  5) The most nested `Optional<T>` where `T` is a referential type is reduced
     to a `Ptr` which can be `0`
@@ -362,7 +373,7 @@ The inner most optional is wrapped around the referential type `Any` thus gets r
 C-pointer:
 ```swift
     // Don't forget about mangling
-    yet_pass__OOOR__V(Optional<Ptr>* value)
+    yet_passP__OOOR__V(EC* context, Optional<Ptr>* value)
 ```
 
 #### Retrieving the results of invocation and error checking for static functions
@@ -387,9 +398,13 @@ That's it for error handling. The actual function's result is passed
 according to the following rules:
  1) Scalar primitive types are passed as is inside the aforementioned
     `Result` structure (as its `value` member). There are dedicated
-    structures like `IntResult`, `BoolResult` and so on
+    structures like `IntResult`, `BoolResult` and so on. In this case
+    you must specify **function** calling convention (`F`)
+ 2) Functions which return nothing (i.e. `Void`) make use of `VoidResult`
+    structure and specify **procedure** calling convention (`P`)
  2) Structure results are not returned. Instead, a client has to pass
     a C-pointer to the destination structure as the **last** parameter.
+    In this case function gets a **procedure** calling convention.
     This structure is usually allocated at client's stack before the
     function invocation. The function has to fill its fields with
     appropriate values:
@@ -405,14 +420,15 @@ according to the following rules:
     // Yet.
     // Note: it uses `VoidResult` because it doesn't return a point
     // via the result's instance
-    VoidResult yet_shift__Point_1c0__1c0(Point* point, Point* offset, Point* result) {
+    VoidResult yet_shiftP__Point_1c0__1c0(EC* context, Point* point, Point* offset, Point* result) {
         result->x = point->x + offset->x;
         result->y = point->y + offset->y;
         return okResult();  // inline for `VoidResult{ 0 }`
     }
 ```
  3) Objects on heap are returned with a `PtrResult` which has its
-    `value` member set to `Ptr` pointing to the object. The *callee side*
+    `value` member set to `Ptr` pointing to the object and thus
+    **function** calling convention is used. The *callee side*
     must ensure reference counter of this object is not less than 1 in order
     to keep it from early deallocation. There are three things that you have
     to keep in mind so as to prevent memory leaks:
@@ -449,12 +465,40 @@ the result of inner function:
     }
 ```
 
+#### Reduced functions
+Some of the Yet runtime's functions are not supposed to return any error.
+Such functions **don't wrap** their return value with a `Result` structure.
+Also they don't need an `ExecutionContext` as their first argument.
+This calling convention is called **reduced** and denoted with `R`.
+
+The remaining rules for them stay the same though. This means you are still
+passing structures (and optionals) via pointers.
+
+The common examples of functions with the reduced calling conventions are:
+ * `Allocator::allocate(size:)` and similar
+ * `retain()` and `release()`
+ * object's deinitializer
+
+**Note:** you may want to think that such functions cannot fail.
+Well, it's not true in general. Obviously, the allocator *can* fail if
+the system has run out of available memory. But it's totally fine because
+you cannot do anything with such an error. In fact, the program will
+**terminate** immediately when there is no memory left. Absolutely the same
+is true for any other reduced function: the runtime guarantees that program
+will terminate if it fails.
+
+So the moral of this fable is the following: a function uses reduced
+calling convention if and only if it's guaranteed to produce
+**unrecoverable errors only**, i.e. when it's not possible to continue
+the program's execution.
+
 #### Retrieving the results for generic functions
 Since generic functions are generated by a compiler on a client's side
 (and not exported from DLL), there is no need to follow the same rules
 for returning an invocation result. Instead, **every resulting value**
-is returned as is wrapped with `Result<T>`. The only notable exception is
-for the referential values which are still returned as `Ptr` instances
+is returned as is wrapped with `Result<T>` and thus **function**
+calling convention is used. The only notable exception is for the
+referential values which are still returned as `Ptr` instances
 via `Result<Ptr>`.
 
 
