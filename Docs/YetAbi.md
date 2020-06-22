@@ -402,7 +402,7 @@ according to the following rules:
     you must specify **function** calling convention (`F`)
  2) Functions which return nothing (i.e. `Void`) make use of `VoidResult`
     structure and specify **procedure** calling convention (`P`)
- 2) Structure results are not returned. Instead, a client has to pass
+ 3) Structure results are not returned. Instead, a client has to pass
     a C-pointer to the destination structure as the **last** parameter.
     In this case function gets a **procedure** calling convention.
     This structure is usually allocated at client's stack before the
@@ -426,7 +426,7 @@ according to the following rules:
         return okResult();  // inline for `VoidResult{ 0 }`
     }
 ```
- 3) Objects on heap are returned with a `PtrResult` which has its
+ 4) Objects on heap are returned with a `PtrResult` which has its
     `value` member set to `Ptr` pointing to the object and thus
     **function** calling convention is used. The *callee side*
     must ensure reference counter of this object is not less than 1 in order
@@ -452,10 +452,9 @@ according to the following rules:
         // Some actions
         return okResult(ref.retain());
     }
-```
-Well, actually, if "Some actions" part is not present, you can just return
-the result of inner function:
-```swift
+
+    // Well, actually, if "Some actions" part is not present, you can
+    // just return the result of inner function:
     PtrResult outer(Int argument) {
         PtrResult result = inner(argument);
         if (result.error) {
@@ -463,6 +462,18 @@ the result of inner function:
         }
         return result;
     }
+```
+ 5) Optionals of referential types are also returned via `PtrResult`
+    except for its `value` field can be set to zero in order to indicate
+    `none`. **Function** calling convention is used
+ 6) Optionals of value types are returned via the last function's argument
+    which is a C-pointer to a desirable output value. The function itself
+    returns `BoolResult` in order to indicate whether the output value
+    was overwritten. **Procedure** calling convention is used:
+```swift
+    func indexOf(ch: Char, s: String) -> Int?
+    <=>
+    BoolResult yet_indexOfP__C_S__OI(EC* context, Char ch, Ptr s, Int* result);
 ```
 
 #### Reduced functions
