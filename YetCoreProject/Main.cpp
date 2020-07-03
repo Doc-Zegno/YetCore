@@ -2,6 +2,7 @@
 #include <type_traits>
 
 #include "Any.h"
+#include "Ref.h"
 #include "PtrX.h"
 #include "Module.h"
 #include "Allocator.h"
@@ -28,6 +29,7 @@ void demoModulePath() {
 void demoBasicArray() {
     auto result = BasicArray<int>::__new__V__s(nullptr);
     auto ptr = result.value;
+    auto ref = refOf(ptr);
     std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
     BasicArray<int>::addP__s_t1__V(nullptr, ptr, 42);
     BasicArray<int>::addP__s_t1__V(nullptr, ptr, 137);
@@ -40,7 +42,27 @@ void demoBasicArray() {
     if (table->type == &yet_Any__type) {
         std::cout << "Found Any table at address: " << table->type << std::endl;
     }
-    release(ptr);
+}
+
+void demoVector() {
+    auto values = std::vector<int>();
+    for (auto i = 0; i < 6; i++) {
+        values.push_back(i);
+    }
+    std::cout << "Done\n";
+}
+
+void demoBasicArrayNested() {
+    auto result = BasicArray<Ref>::__new__V__s(nullptr);
+    auto ptr = result.value;
+    auto ref = refOf(ptr);
+    for (auto i = 0; i < 6; i++) {
+        auto result = BasicArray<Ref>::__new__V__s(nullptr);
+        auto nestedPtr = result.value;
+        auto nestedRef = refOf(nestedPtr);
+        BasicArray<Ref>::addP__s_t1__V(nullptr, ptr, nestedRef);
+    }
+    std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
 }
 
 void printStackTrace(ExecutionContext* context) {
@@ -67,6 +89,8 @@ int main() {
     StackFrame frame(context, __FUNCTION__);
     demoModulePath();
     demoBasicArray();
+    demoVector();
+    demoBasicArrayNested();
     frame.setLineAfter(__LINE__);
     demoNested1(context);
     printStackTrace(context);

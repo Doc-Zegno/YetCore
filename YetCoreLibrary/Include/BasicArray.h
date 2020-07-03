@@ -28,8 +28,8 @@ struct BasicArray {
 	}
 
 	static VoidResult __init__PV__V(EC* context, void* object) {
-		auto any = (Any*)object;
-		any->__type = &__typeHolder.type;
+		auto self = new(object) BasicArray<E>;
+		self->__base.__type = &__typeHolder.type;
 		return okResult();
 	}
 

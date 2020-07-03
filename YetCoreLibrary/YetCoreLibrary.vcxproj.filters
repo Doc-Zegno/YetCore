@@ -60,6 +60,9 @@
     <ClInclude Include="Include\ExpressionLocation.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Ref.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
