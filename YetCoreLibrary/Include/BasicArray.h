@@ -11,13 +11,13 @@ struct BasicArray {
 	Any __base;
 	std::vector<E> _elements;
 
-	static VoidResult addP__s_t1__V(EC* context, Ptr self, E element) {
+	static VoidResult addG__s_t1__V(EC* context, Ptr self, E element) {
 		auto basicArray = (BasicArray<E>*)self;
 		basicArray->_elements.push_back(element);
 		return okResult();
 	}
 
-	static Result<E> getF__operator__s_I__t1(EC* context, Ptr self, int index) {
+	static Result<E> getG__operator__s_I__t1(EC* context, Ptr self, int index) {
 		auto basicArray = (BasicArray<E>*)self;
 		auto& elements = basicArray->_elements;
 		if (index >= 0 && index < int(elements.size())) {

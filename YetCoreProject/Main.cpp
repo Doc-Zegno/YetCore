@@ -31,12 +31,12 @@ void demoBasicArray() {
     auto ptr = result.value;
     auto ref = refOf(ptr);
     std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
-    BasicArray<int>::addP__s_t1__V(nullptr, ptr, 42);
-    BasicArray<int>::addP__s_t1__V(nullptr, ptr, 137);
+    BasicArray<int>::addG__s_t1__V(nullptr, ptr, 42);
+    BasicArray<int>::addG__s_t1__V(nullptr, ptr, 137);
     std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
-    std::cout << "Element #0: " << BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 0).value << std::endl;
-    std::cout << "Element #1: " << BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 1).value << std::endl;
-    std::cout << "Element #2: error? -> " << BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 2).error << std::endl;
+    std::cout << "Element #0: " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 0).value << std::endl;
+    std::cout << "Element #1: " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 1).value << std::endl;
+    std::cout << "Element #2: error? -> " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 2).error << std::endl;
 
     auto table = findTableOf<Any>(ptr);
     if (table->type == &yet_Any__type) {
@@ -60,7 +60,7 @@ void demoBasicArrayNested() {
         auto result = BasicArray<Ref>::__new__V__s(nullptr);
         auto nestedPtr = result.value;
         auto nestedRef = refOf(nestedPtr);
-        BasicArray<Ref>::addP__s_t1__V(nullptr, ptr, nestedRef);
+        BasicArray<Ref>::addG__s_t1__V(nullptr, ptr, nestedRef);
     }
     std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
 }
