@@ -63,6 +63,9 @@
     <ClInclude Include="Include\Ref.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Optional.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

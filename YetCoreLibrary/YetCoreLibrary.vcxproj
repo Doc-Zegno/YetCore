@@ -164,6 +164,7 @@
     <ClInclude Include="Include\ExpressionLocation.h" />
     <ClInclude Include="Include\Manageable.h" />
     <ClInclude Include="Include\Module.h" />
+    <ClInclude Include="Include\Optional.h" />
     <ClInclude Include="Include\Ptr.h" />
     <ClInclude Include="Include\PtrX.h" />
     <ClInclude Include="Include\Ref.h" />

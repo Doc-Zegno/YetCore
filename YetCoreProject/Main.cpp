@@ -1,3 +1,4 @@
+#include <string>
 #include <iostream>
 #include <type_traits>
 
@@ -5,6 +6,7 @@
 #include "Ref.h"
 #include "PtrX.h"
 #include "Module.h"
+#include "Optional.h"
 #include "Allocator.h"
 #include "BasicArray.h"
 #include "StackFrame.h"
@@ -65,6 +67,49 @@ void demoBasicArrayNested() {
     std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
 }
 
+void demoOptionalString() {
+    auto s = std::string("Sample Text");
+    std::cout << "Num allocated at start: " << yet_allocatedCountR__get__V__I() << "\n";
+    auto optional = Optional<std::string>(s);
+    std::cout << "After one optional: " << yet_allocatedCountR__get__V__I() << "\n";
+    auto copy = optional;
+    std::cout << "After copy: " << yet_allocatedCountR__get__V__I() << "\n";
+    std::cout << "Is optional some? -> " << optional.isSome() << "\n";
+    std::cout << "Is copy some? -> " << copy.isSome() << "\n";
+    std::cout << "Copy's value: " << copy.getValue() << "\n";
+    auto move = std::move(copy);
+    std::cout << "After move: " << yet_allocatedCountR__get__V__I() << "\n";
+    std::cout << "Is source some? -> " << copy.isSome() << "\n";
+    std::cout << "Is destination some -> " << move.isSome() << "\n";
+    std::cout << "Move's value: " << move.getValue() << "\n";
+    copy = move;
+    std::cout << "After copy assignment: " << yet_allocatedCountR__get__V__I() << "\n";
+    std::cout << "Is source some? -> " << move.isSome() << "\n";
+    std::cout << "Is destination some -> " << copy.isSome() << "\n";
+    std::cout << "Copy's value: " << copy.getValue() << "\n";
+    move = std::move(copy);
+    std::cout << "After move assignment: " << yet_allocatedCountR__get__V__I() << "\n";
+    std::cout << "Is source some? -> " << copy.isSome() << "\n";
+    std::cout << "Is destination some -> " << move.isSome() << "\n";
+    std::cout << "Move's value: " << move.getValue() << "\n";
+}
+
+void demoOptionalRef() {
+    auto nullable = Nullable();
+    {
+        auto result = BasicArray<int>::__new__V__s(nullptr);
+        auto ptr = result.value;
+        auto ref = refOf(ptr);
+        for (auto i = 0; i < 10; i++) {
+            BasicArray<int>::addG__s_t1__V(nullptr, ptr, i);
+        }
+        std::cout << "Num allocated at start: " << yet_allocatedCountR__get__V__I() << "\n";
+        nullable = Nullable(ref);
+    }
+    std::cout << "After nullable: " << yet_allocatedCountR__get__V__I() << "\n";
+    std::cout << "Is nullable some? -> " << nullable.isSome() << "\n";
+}
+
 void printStackTrace(ExecutionContext* context) {
     std::cout << "Stack trace:\n";
     for (auto frame = context->current; frame; frame = frame->previous) {
@@ -87,10 +132,13 @@ void demoNested1(ExecutionContext* context) {
 int main() {
     ExecutionContext* context = nullptr;
     StackFrame frame(context, __FUNCTION__);
+    std::cout << std::boolalpha;
     demoModulePath();
     demoBasicArray();
     demoVector();
     demoBasicArrayNested();
+    demoOptionalString();
+    demoOptionalRef();
     frame.setLineAfter(__LINE__);
     demoNested1(context);
     printStackTrace(context);
