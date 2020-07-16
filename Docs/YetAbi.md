@@ -434,24 +434,24 @@ according to the following rules:
     to keep it from early deallocation. There are three things that you have
     to keep in mind so as to prevent memory leaks:
      * The safest way of dealing with a referential results is to wrap
-       them with a `Ref` **immediately** using `refOf()` function.
+       them with a `Ref` **immediately** using `protect()` function.
        `Ref` has appropriate destructor which will automatically decrease
-       a reference counter on leaving the scope. Please, note: `refOf()`
+       a reference counter on leaving the scope. Please, note: `protect()`
        **doesn't** increase a counter so it won't become 2
      * If for some reason you are not going to use `Ref` wrapper,
        you can decrease the reference counter manually using `release()`
-     * Since `Ref` dtor will decrease the counter, you have to increase it
+     * Since `Ref` dtor will decrease the counter, you have to discard it
        manually if you're going to return the pointer further. This is done
-       with a `retain()` method:
+       with a `unprotect()` method:
 ```swift
     PtrResult outer(Int argument) {
         PtrResult result = inner(argument);
         if (result.error) {
             // Error handling
         }
-        Ref ref = refOf(result.value);
+        Ref ref = protect(result.value);
         // Some actions
-        return okResult(ref.retain());
+        return okResult(ref.unprotect());
     }
 
     // Well, actually, if "Some actions" part is not present, you can

@@ -20,6 +20,14 @@ namespace YetCoreTests {
 			});
 		}
 
+		static PtrResult createIntArray(int first, int second) {
+			auto result = BasicArray<int>::__new__V__s(nullptr);
+			auto ref = protect(result.value);
+			BasicArray<int>::addG__s_t1__V(nullptr, ref.get(), first);
+			BasicArray<int>::addG__s_t1__V(nullptr, ref.get(), second);
+			return okResult(ref.unprotect());
+		}
+
 	public:
 		TEST_METHOD(DefaultCtor) {
 			runWithMemoryCheck([] {
@@ -30,7 +38,7 @@ namespace YetCoreTests {
 
 		TEST_METHOD(ValueCtor) {
 			runWithArray([](Ptr ptr, intptr_t allocatedCount) {
-				auto ref = refOf(ptr);
+				auto ref = protect(ptr);
 				Assert::AreEqual(ptr, ref.get());
 				assertAllocatedCount(allocatedCount);
 			});
@@ -38,7 +46,7 @@ namespace YetCoreTests {
 
 		TEST_METHOD(CopyCtor) {
 			runWithArray([](Ptr ptr, intptr_t allocatedCount) {
-				auto ref = refOf(ptr);
+				auto ref = protect(ptr);
 				auto copy = ref;
 				Assert::AreEqual(ptr, ref.get());
 				Assert::AreEqual(ptr, copy.get());
@@ -48,7 +56,7 @@ namespace YetCoreTests {
 
 		TEST_METHOD(MoveCtor) {
 			runWithArray([](Ptr ptr, intptr_t allocatedCount) {
-				auto ref = refOf(ptr);
+				auto ref = protect(ptr);
 				auto move = std::move(ref);
 				Assert::AreEqual(Ptr(), ref.get());
 				Assert::AreEqual(ptr, move.get());
@@ -60,7 +68,7 @@ namespace YetCoreTests {
 			runWithArray([](Ptr ptr, intptr_t allocatedCount) {
 				auto copy = Ref();
 				{
-					auto ref = refOf(ptr);
+					auto ref = protect(ptr);
 					copy = ref;
 					Assert::AreEqual(ptr, ref.get());
 					assertAllocatedCount(allocatedCount);
@@ -74,7 +82,7 @@ namespace YetCoreTests {
 			runWithArray([](Ptr ptr, intptr_t allocatedCount) {
 				auto move = Ref();
 				{
-					auto ref = refOf(ptr);
+					auto ref = protect(ptr);
 					move = std::move(ref);
 					Assert::AreEqual(Ptr(), ref.get());
 					assertAllocatedCount(allocatedCount);
@@ -88,14 +96,28 @@ namespace YetCoreTests {
 			runWithMemoryCheck([] {
 				auto result = BasicArray<Ref>::__new__V__s(nullptr);
 				auto ptr = result.value;
-				auto ref = refOf(ptr);
+				auto ref = protect(ptr);
 				for (auto i = 0; i < 6; i++) {
 					auto result = BasicArray<Ref>::__new__V__s(nullptr);
 					auto nestedPtr = result.value;
-					auto nestedRef = refOf(nestedPtr);
+					auto nestedRef = protect(nestedPtr);
 					BasicArray<Ref>::addG__s_t1__V(nullptr, ptr, nestedRef);
 				}
 				logAllocatedCount(__FUNCTION__);
+			});
+		}
+
+		TEST_METHOD(ProtectUnprotect) {
+			runWithMemoryCheck([] {
+				auto startCount = Allocator::getAllocatedCount();
+				auto first = 137;
+				auto second = 42;
+				auto result = createIntArray(first, second);
+				auto ref = protect(result.value);
+				logAllocatedCount(__FUNCTION__);
+				Assert::IsTrue(Allocator::getAllocatedCount() > startCount, L"Array has been released too early");
+				Assert::AreEqual(first, BasicArray<int>::getG__operator__s_I__t1(nullptr, ref.get(), 0).value);
+				Assert::AreEqual(second, BasicArray<int>::getG__operator__s_I__t1(nullptr, ref.get(), 1).value);
 			});
 		}
 	};

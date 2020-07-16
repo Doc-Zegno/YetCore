@@ -5,7 +5,7 @@
 #include "PtrX.h"
 
 /// <summary>
-/// A thin wrapper around <code>Ptr</code> which enables automatic reference counting.
+/// A thin wrapper around <c>Ptr</c> which enables automatic reference counting.
 /// <note type="caution">
 /// It must be considered not null in most cases. Null value is only allowed to indicate
 /// it hasn't been initialized with a proper value yet
@@ -51,6 +51,41 @@ struct Ref {
 		}
 	}
 
+	/// <summary>
+	/// Disable this automatic reference and return protected pointer.
+	/// <note type="caution">
+	/// From this moment, the reference is considered to be invalid
+	/// and its destructor won't be called thus previously protected
+	/// pointer won't be released
+	/// </note>
+	/// </summary>
+	/// <remarks>
+	/// The only justified usage for this method is to return
+	/// protected pointer from a function without releasing it.
+	/// Keep in mind, that this task can be accomplished by the means
+	/// of <c>retain()</c> method as well (see example section)
+	/// but <c>unprotect()</c> is significantly cheaper
+	/// since it doesn't introduce any unnecessary calculations
+	/// </remarks>
+	/// <example>
+	/// <code>
+	/// auto result = yet_YourFunction__V__S();
+	/// auto s = protect(result.value);
+	/// ...
+	/// // The recommended approach:
+	/// return okResult(s.unprotect());
+	/// // Performs the same task but less effective and more verbose:
+	/// s.retain();
+	/// return okResult(s.get());
+	/// </code>
+	/// </example>
+	/// <returns>Previously protected pointer</returns>
+	Ptr unprotect() {
+		auto ptr = _ptr;
+		_ptr = 0;
+		return ptr;
+	}
+
 	~Ref() {
 		if (_ptr) {
 			::release(_ptr);
@@ -73,9 +108,9 @@ struct Ref {
 /// if (result.error) {
 ///     ...
 /// }
-/// auto s = refOf(result.value);
+/// auto s = protect(result.value);
 /// </code>
 /// </example>
-inline Ref refOf(Ptr object) {
+inline Ref protect(Ptr object) {
 	return Ref(object, false);
 }

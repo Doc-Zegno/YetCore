@@ -44,7 +44,7 @@ void demoBasicArray() {
     runDemo("Basic Array", [] {
         auto result = BasicArray<int>::__new__V__s(nullptr);
         auto ptr = result.value;
-        auto ref = refOf(ptr);
+        auto ref = protect(ptr);
         std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
         BasicArray<int>::addG__s_t1__V(nullptr, ptr, 42);
         BasicArray<int>::addG__s_t1__V(nullptr, ptr, 137);
@@ -73,11 +73,11 @@ void demoBasicArrayNested() {
     runDemo("Basic Array Nested", [] {
         auto result = BasicArray<Ref>::__new__V__s(nullptr);
         auto ptr = result.value;
-        auto ref = refOf(ptr);
+        auto ref = protect(ptr);
         for (auto i = 0; i < 6; i++) {
             auto result = BasicArray<Ref>::__new__V__s(nullptr);
             auto nestedPtr = result.value;
-            auto nestedRef = refOf(nestedPtr);
+            auto nestedRef = protect(nestedPtr);
             BasicArray<Ref>::addG__s_t1__V(nullptr, ptr, nestedRef);
         }
         std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
@@ -119,7 +119,7 @@ void demoOptionalRef() {
         {
             auto result = BasicArray<int>::__new__V__s(nullptr);
             auto ptr = result.value;
-            auto ref = refOf(ptr);
+            auto ref = protect(ptr);
             for (auto i = 0; i < 10; i++) {
                 BasicArray<int>::addG__s_t1__V(nullptr, ptr, i);
             }

@@ -15,7 +15,7 @@ namespace YetCoreTests {
             runWithMemoryCheck([&function] {
                 auto result = BasicArray<int>::__new__V__s(nullptr);
                 auto ptr = result.value;
-                auto ref = refOf(ptr);
+                auto ref = protect(ptr);
                 function(ref);
             });
         }
