@@ -88,7 +88,7 @@ void demoOptionalString() {
     runDemo("Optional String", [] {
         auto s = std::string("Sample Text");
         std::cout << "Num allocated at start: " << Allocator::getAllocatedCount() << "\n";
-        auto optional = Optional<std::string>(s);
+        auto optional = optionalOf(s);
         std::cout << "After one optional: " << Allocator::getAllocatedCount() << "\n";
         auto copy = optional;
         std::cout << "After copy: " << Allocator::getAllocatedCount() << "\n";

@@ -22,7 +22,7 @@ namespace YetCoreTests {
 		TEST_METHOD(ValueCtorHeap) {
 			runWithMemoryCheck([] {
                 auto s = std::string("Sample Text");
-                auto optional = Optional<std::string>(s);
+                auto optional = optionalOf(s);
 				Assert::IsTrue(optional.isSome());
 				Assert::AreEqual(s, optional.getValue());
 			});
@@ -31,7 +31,7 @@ namespace YetCoreTests {
 		TEST_METHOD(CopyCtorHeap) {
 			runWithMemoryCheck([] {
 				auto s = std::string("Sample Text");
-				auto optional = Optional<std::string>(s);
+				auto optional = optionalOf(s);
 				auto copy = optional;
 				Assert::IsTrue(optional.isSome());
 				Assert::IsTrue(copy.isSome());
@@ -43,7 +43,7 @@ namespace YetCoreTests {
 		TEST_METHOD(MoveCtorHeap) {
 			runWithMemoryCheck([] {
 				auto s = std::string("Sample Text");
-				auto optional = Optional<std::string>(s);
+				auto optional = optionalOf(s);
 				auto move = std::move(optional);
 				Assert::IsFalse(optional.isSome());
 				Assert::IsTrue(move.isSome());
@@ -56,7 +56,7 @@ namespace YetCoreTests {
 				auto copy = Optional<std::string>();
 				auto s = std::string("Sample Text");
 				{
-					auto optional = Optional<std::string>(s);
+					auto optional = optionalOf(s);
 					copy = optional;
 					Assert::IsTrue(optional.isSome());
 					Assert::AreEqual(s, optional.getValue());
@@ -71,7 +71,7 @@ namespace YetCoreTests {
 				auto move = Optional<std::string>();
 				auto s = std::string("Sample Text");
 				{
-					auto optional = Optional<std::string>(s);
+					auto optional = optionalOf(s);
 					move = std::move(optional);
 					Assert::IsFalse(optional.isSome());
 				}

@@ -84,3 +84,8 @@ struct Optional<Ref> {
 };
 
 using Nullable = Optional<Ref>;
+
+template<typename T>
+inline Optional<T> optionalOf(T value) {
+	return Optional<T>(value);
+}
