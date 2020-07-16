@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YetCoreProject", "YetCorePr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YetCoreLibrary", "YetCoreLibrary\YetCoreLibrary.vcxproj", "{6689467D-8E11-4A10-991C-2F4777500EEC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YetCoreTests", "YetCoreTests\YetCoreTests.vcxproj", "{987E5BCE-49E3-479B-899E-F7A806A0EEC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{6689467D-8E11-4A10-991C-2F4777500EEC}.Release|x64.Build.0 = Release|x64
 		{6689467D-8E11-4A10-991C-2F4777500EEC}.Release|x86.ActiveCfg = Release|Win32
 		{6689467D-8E11-4A10-991C-2F4777500EEC}.Release|x86.Build.0 = Release|Win32
+		{987E5BCE-49E3-479B-899E-F7A806A0EEC5}.Debug|x64.ActiveCfg = Debug|x64
+		{987E5BCE-49E3-479B-899E-F7A806A0EEC5}.Debug|x64.Build.0 = Debug|x64
+		{987E5BCE-49E3-479B-899E-F7A806A0EEC5}.Debug|x86.ActiveCfg = Debug|Win32
+		{987E5BCE-49E3-479B-899E-F7A806A0EEC5}.Debug|x86.Build.0 = Debug|Win32
+		{987E5BCE-49E3-479B-899E-F7A806A0EEC5}.Release|x64.ActiveCfg = Release|x64
+		{987E5BCE-49E3-479B-899E-F7A806A0EEC5}.Release|x64.Build.0 = Release|x64
+		{987E5BCE-49E3-479B-899E-F7A806A0EEC5}.Release|x86.ActiveCfg = Release|Win32
+		{987E5BCE-49E3-479B-899E-F7A806A0EEC5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
