@@ -24,14 +24,14 @@ namespace YetCoreTests {
 		TEST_METHOD(DefaultCtor) {
 			runWithMemoryCheck([] {
 				auto ref = Ref();
-				Assert::AreEqual(Ptr(), ref._ptr);
+				Assert::AreEqual(Ptr(), ref.get());
 			});
 		}
 
 		TEST_METHOD(ValueCtor) {
 			runWithArray([](Ptr ptr, intptr_t allocatedCount) {
 				auto ref = refOf(ptr);
-				Assert::AreEqual(ptr, ref._ptr);
+				Assert::AreEqual(ptr, ref.get());
 				assertAllocatedCount(allocatedCount);
 			});
 		}
@@ -40,8 +40,8 @@ namespace YetCoreTests {
 			runWithArray([](Ptr ptr, intptr_t allocatedCount) {
 				auto ref = refOf(ptr);
 				auto copy = ref;
-				Assert::AreEqual(ptr, ref._ptr);
-				Assert::AreEqual(ptr, copy._ptr);
+				Assert::AreEqual(ptr, ref.get());
+				Assert::AreEqual(ptr, copy.get());
 				assertAllocatedCount(allocatedCount);
 			});
 		}
@@ -50,8 +50,8 @@ namespace YetCoreTests {
 			runWithArray([](Ptr ptr, intptr_t allocatedCount) {
 				auto ref = refOf(ptr);
 				auto move = std::move(ref);
-				Assert::AreEqual(Ptr(), ref._ptr);
-				Assert::AreEqual(ptr, move._ptr);
+				Assert::AreEqual(Ptr(), ref.get());
+				Assert::AreEqual(ptr, move.get());
 				assertAllocatedCount(allocatedCount);
 			});
 		}
@@ -62,10 +62,10 @@ namespace YetCoreTests {
 				{
 					auto ref = refOf(ptr);
 					copy = ref;
-					Assert::AreEqual(ptr, ref._ptr);
+					Assert::AreEqual(ptr, ref.get());
 					assertAllocatedCount(allocatedCount);
 				}
-				Assert::AreEqual(ptr, copy._ptr);
+				Assert::AreEqual(ptr, copy.get());
 				assertAllocatedCount(allocatedCount);
 			});
 		}
@@ -76,10 +76,10 @@ namespace YetCoreTests {
 				{
 					auto ref = refOf(ptr);
 					move = std::move(ref);
-					Assert::AreEqual(Ptr(), ref._ptr);
+					Assert::AreEqual(Ptr(), ref.get());
 					assertAllocatedCount(allocatedCount);
 				}
-				Assert::AreEqual(ptr, move._ptr);
+				Assert::AreEqual(ptr, move.get());
 				assertAllocatedCount(allocatedCount);
 			});
 		}

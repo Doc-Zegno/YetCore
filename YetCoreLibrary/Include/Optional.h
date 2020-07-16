@@ -71,11 +71,11 @@ struct Optional<Ref> {
 	explicit Optional(Ref ref) : _ref(ref) {}
 
 	bool isSome() {
-		return _ref._ptr;
+		return _ref.get();
 	}
 
 	bool isNone() {
-		return !_ref._ptr;
+		return !_ref.get();
 	}
 
 	Ref getValue() {

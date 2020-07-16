@@ -6,8 +6,10 @@
 
 /// <summary>
 /// A thin wrapper around <code>Ptr</code> which enables automatic reference counting.
+/// <note type="caution">
 /// It must be considered not null in most cases. Null value is only allowed to indicate
 /// it hasn't been initialized with a proper value yet
+/// </note>
 /// </summary>
 struct Ref {
 	Ptr _ptr;
@@ -31,6 +33,10 @@ struct Ref {
 
 	void operator=(Ref other) {
 		std::swap(_ptr, other._ptr);
+	}
+
+	Ptr get() {
+		return _ptr;
 	}
 
 	void retain() {

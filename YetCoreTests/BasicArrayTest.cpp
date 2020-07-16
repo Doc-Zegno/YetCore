@@ -23,7 +23,7 @@ namespace YetCoreTests {
 	public:
 		TEST_METHOD(BasicFunctionality) {
             runWithArray([](Ref ref) {
-                auto ptr = ref._ptr;
+                auto ptr = ref.get();
                 BasicArray<int>::addG__s_t1__V(nullptr, ptr, 42);
                 BasicArray<int>::addG__s_t1__V(nullptr, ptr, 137);
                 auto element0 = BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 0).value;
