@@ -13,11 +13,11 @@
 #include "StackFrame.h"
 
 void* operator new(size_t size) {
-    return yet_allocateR__U_B_B__PV((uintptr_t)size, false, false);
+    return Allocator::allocate((uintptr_t)size, false, false);
 }
 
 void operator delete(void* object) {
-    yet_deallocateR__PV__V(object);
+    Allocator::deallocate(object);
 }
 
 void runDemo(const char* name, std::function<void(void)> demo) {
@@ -25,7 +25,7 @@ void runDemo(const char* name, std::function<void(void)> demo) {
     std::cout << "<demo>\n";
     demo();
     std::cout << "</demo>\n";
-    std::cout << "Num allocated on exit: " << yet_allocatedCountR__get__V__I() << "\n";
+    std::cout << "Num allocated on exit: " << Allocator::getAllocatedCount() << "\n";
     std::cout << "</" << name << ">\n\n";
 }
 
@@ -45,10 +45,10 @@ void demoBasicArray() {
         auto result = BasicArray<int>::__new__V__s(nullptr);
         auto ptr = result.value;
         auto ref = refOf(ptr);
-        std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
+        std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
         BasicArray<int>::addG__s_t1__V(nullptr, ptr, 42);
         BasicArray<int>::addG__s_t1__V(nullptr, ptr, 137);
-        std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
+        std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
         std::cout << "Element #0: " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 0).value << std::endl;
         std::cout << "Element #1: " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 1).value << std::endl;
         std::cout << "Element #2: error? -> " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 2).error << std::endl;
@@ -80,33 +80,33 @@ void demoBasicArrayNested() {
             auto nestedRef = refOf(nestedPtr);
             BasicArray<Ref>::addG__s_t1__V(nullptr, ptr, nestedRef);
         }
-        std::cout << "Num allocated: " << yet_allocatedCountR__get__V__I() << std::endl;
+        std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
     });
 }
 
 void demoOptionalString() {
     runDemo("Optional String", [] {
         auto s = std::string("Sample Text");
-        std::cout << "Num allocated at start: " << yet_allocatedCountR__get__V__I() << "\n";
+        std::cout << "Num allocated at start: " << Allocator::getAllocatedCount() << "\n";
         auto optional = Optional<std::string>(s);
-        std::cout << "After one optional: " << yet_allocatedCountR__get__V__I() << "\n";
+        std::cout << "After one optional: " << Allocator::getAllocatedCount() << "\n";
         auto copy = optional;
-        std::cout << "After copy: " << yet_allocatedCountR__get__V__I() << "\n";
+        std::cout << "After copy: " << Allocator::getAllocatedCount() << "\n";
         std::cout << "Is optional some? -> " << optional.isSome() << "\n";
         std::cout << "Is copy some? -> " << copy.isSome() << "\n";
         std::cout << "Copy's value: " << copy.getValue() << "\n";
         auto move = std::move(copy);
-        std::cout << "After move: " << yet_allocatedCountR__get__V__I() << "\n";
+        std::cout << "After move: " << Allocator::getAllocatedCount() << "\n";
         std::cout << "Is source some? -> " << copy.isSome() << "\n";
         std::cout << "Is destination some -> " << move.isSome() << "\n";
         std::cout << "Move's value: " << move.getValue() << "\n";
         copy = move;
-        std::cout << "After copy assignment: " << yet_allocatedCountR__get__V__I() << "\n";
+        std::cout << "After copy assignment: " << Allocator::getAllocatedCount() << "\n";
         std::cout << "Is source some? -> " << move.isSome() << "\n";
         std::cout << "Is destination some -> " << copy.isSome() << "\n";
         std::cout << "Copy's value: " << copy.getValue() << "\n";
         move = std::move(copy);
-        std::cout << "After move assignment: " << yet_allocatedCountR__get__V__I() << "\n";
+        std::cout << "After move assignment: " << Allocator::getAllocatedCount() << "\n";
         std::cout << "Is source some? -> " << copy.isSome() << "\n";
         std::cout << "Is destination some -> " << move.isSome() << "\n";
         std::cout << "Move's value: " << move.getValue() << "\n";
@@ -123,10 +123,10 @@ void demoOptionalRef() {
             for (auto i = 0; i < 10; i++) {
                 BasicArray<int>::addG__s_t1__V(nullptr, ptr, i);
             }
-            std::cout << "Num allocated at start: " << yet_allocatedCountR__get__V__I() << "\n";
+            std::cout << "Num allocated at start: " << Allocator::getAllocatedCount() << "\n";
             nullable = Nullable(ref);
         }
-        std::cout << "After nullable: " << yet_allocatedCountR__get__V__I() << "\n";
+        std::cout << "After nullable: " << Allocator::getAllocatedCount() << "\n";
         std::cout << "Is nullable some? -> " << nullable.isSome() << "\n";
     });
 }
@@ -167,5 +167,5 @@ int main() {
     printStackTrace(context);
     std::cout << "Any name: " << typeOf<Any>()->name << std::endl;
     std::cout << "Array name: " << BasicArray<int>::__typeHolder.type.name << std::endl;
-    std::cout << "Num allocated on exit: " << yet_allocatedCountR__get__V__I() << std::endl;
+    std::cout << "Num allocated on exit: " << Allocator::getAllocatedCount() << std::endl;
 }

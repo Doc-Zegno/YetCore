@@ -15,7 +15,7 @@ namespace YetCoreTests {
 			runWithMemoryCheck([&function] {
 				auto result = BasicArray<Ref>::__new__V__s(nullptr);
 				auto ptr = result.value;
-				auto allocatedCount = yet_allocatedCountR__get__V__I();
+				auto allocatedCount = Allocator::getAllocatedCount();
 				function(ptr, allocatedCount);
 			});
 		}

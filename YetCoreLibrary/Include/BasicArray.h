@@ -34,7 +34,7 @@ struct BasicArray {
 	}
 
 	static PtrResult __new__V__s(EC* context) {
-		auto place = yet_allocateR__U__PV(sizeof(BasicArray<E>));
+		auto place = Allocator::allocate(sizeof(BasicArray<E>));
 		auto result = __init__PV__V(context, place);
 		if (!result.error) {
 			return okResult(Ptr(place));

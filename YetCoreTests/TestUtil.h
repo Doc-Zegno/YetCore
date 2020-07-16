@@ -9,9 +9,9 @@
 namespace YetCoreTests {
 	template<typename TFunction>
 	inline void runWithMemoryCheck(const TFunction& function) {
-		auto startCount = yet_allocatedCountR__get__V__I();
+		auto startCount = Allocator::getAllocatedCount();
 		function();
-		auto endCount = yet_allocatedCountR__get__V__I();
+		auto endCount = Allocator::getAllocatedCount();
 		Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(startCount, endCount, L"Memory load before and after test are not equal");
 	}
 
@@ -22,10 +22,10 @@ namespace YetCoreTests {
 	}
 
 	inline void logAllocatedCount(const char* place) {
-		logValue(place, "Allocated count", yet_allocatedCountR__get__V__I());
+		logValue(place, "Allocated count", Allocator::getAllocatedCount());
 	}
 
 	inline void assertAllocatedCount(intptr_t expected) {
-		Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(expected, yet_allocatedCountR__get__V__I());
+		Microsoft::VisualStudio::CppUnitTestFramework::Assert::AreEqual(expected, Allocator::getAllocatedCount());
 	}
 }
