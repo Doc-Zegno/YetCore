@@ -20,21 +20,19 @@ Consider the example below:
 ```
 This method yields the following name:
 ```
-    yet_CompanyName_ProjectName_Image_saveP__s_S_S_S__V
+    yet_CompanyName_ProjectName_Image_saveF__s_S_S_S__V
 ```
 
 So, as you can see:
  1) Prepend name with a `yet_` prefix
  2) Write down method's full qualification joined with an underscore:
     `CompanyName_ProjectName_Image_save`
- 3) Specify method's calling convention, typically it's `F`, `P` or `G`
+ 3) Specify method's calling convention, typically it's `F`
     (for more details see a dedicated section on method invocations):
 
 | Letters | Convention |
 | ------- | ---------- |
 | `F`     | Function   |
-| `P`     | Procedure  |
-| `G`     | Generic    |
 | `R`     | Reduced    |
 | `D`     | Dynamic    |
 
@@ -74,7 +72,7 @@ Please, note:
  * `s` is treated as `self` only when it is **the first** character
  * `V` is used when function has no parameters at all (static function):
 ```swift
-    func printNewLine() <=> yet_printNewLineP__V__V
+    func printNewLine() <=> yet_printNewLineF__V__V
 ```
  * `Any` is denoted with `R` (for `Ref`)
  * `Iterable` is denoted with `E` and not `I`
@@ -84,9 +82,9 @@ Please, note:
    an ordinal value. Also they become a part of their owner's name:
 ```swift
     // This one is a bit tricky.
-    // `2tfindG_t1_t2` corresponds to `find<E, T>`
+    // `2tfindF_t1_t2` corresponds to `find<E, T>`
     // (you'll get more information about such a format later).
-    func find<E, T>(e: E, t: T): T? <=> yet_2tfindG_t1_t2__t1_t2__Ot2
+    func find<E, T>(e: E, t: T): T? <=> yet_2tfindF_t1_t2__t1_t2__Ot2
 ```
  * `Tuple` is followed by a number of its template type arguments:
 ```swift
@@ -135,7 +133,7 @@ In order to address such cases, the following rules are used:
 
     // Technically, the same stay true for template function names
     func find<E, T>(e: E, t: T): T? <=>
-        yet_2tfindG_t1_t2__t1_t2__Ot2()
+        yet_2tfindF_t1_t2__t1_t2__Ot2()
 ```
  5) All the prefices are applied in **the reversed order** (so prefix #4
     goes before prefix #3):
@@ -169,7 +167,7 @@ In order to address such cases, the following rules are used:
     // Please, note: `MegaApp.Models.User` actually has 3 parts
     //   but with a `2c` it becomes `2c.User` and thus has only 2 parts
     MegaApp.Models.Util.createFrom(user: MegaApp.Models.User) <=>
-        yet_MegaApp_Models_Util_createFromP__2p2c_User__V()
+        yet_MegaApp_Models_Util_createFromF__2p2c_User__V()
 ```
  8) Similar shorthand is used when the common parts are borrowed from
     previous argument types. In this case a `NcI` mnemonic is used
@@ -199,7 +197,7 @@ In order to address such cases, the following rules are used:
 Now let's try it out:
 ```swift
     koalas.util.print_header(df: koalas.DataFrame<Int, Array<Images.Filter>>, rows: Int) <=>
-        yet_koalas_util_2wprint_headerP__2t2p1c_DataFrame_I_1tArray_2pImages_Filter_I__V()
+        yet_koalas_util_2wprint_headerF__2t2p1c_DataFrame_I_1tArray_2pImages_Filter_I__V()
 ```
 ~~Still pretty readable~~.
 
@@ -216,7 +214,7 @@ can be injected between a method name and a parameter list:
 
     // Yet (standard prefices are omitted). Also note `self` parameter
     Widget_isVisibleF__get__s__B
-    Widget_isVisibleP__set__s_B__V
+    Widget_isVisibleF__set__s_B__V
 ```
  2) Operators with `operator`:
  ```swift
@@ -234,7 +232,7 @@ can be injected between a method name and a parameter list:
 
     // Yet
     getF__operator__s_I__F
-    setP__operator__s_I_F__V
+    setF__operator__s_I_F__V
  ```
   3) (Re:Lite special) extensions:
 ```swift
@@ -360,21 +358,22 @@ The following rules are used:
 ```swift
     func setResolution(value: Int?)
     <=>
-    yet_setResolutionP__OI__V(EC* context, Int* value)
+    yet_setResolutionF__OI__V(EC* context, Int* value)
 ```
- 5) The most nested `Optional<T>` where `T` is a referential type is reduced
+ 5) Top-level `Optional<T>` where `T` is a referential type is reduced
     to a `Ptr` which can be `0`
 
 Let's find out how the latest rules work in a bit complicated scenario:
 ```swift
     func pass(value: Any???)
 ```
-The inner most optional is wrapped around the referential type `Any` thus gets reduced to a `Ptr`. The outer most one is wrapped around the
-*value type* `Optional<Optional<Any>>` thus gets replaced with a vanilla
-C-pointer:
+The outer most optional is wrapped around the *value type*
+`Optional<Optional<Ptr>>` thus gets replaced with a vanilla C-pointer.
+The inner most `Optional<Ptr>` is not a top-level one so there is no
+reduction to `Ptr`:
 ```swift
     // Don't forget about mangling
-    yet_passP__OOOR__V(EC* context, Optional<Ptr>* value)
+    yet_passF__OOOR__V(EC* context, Optional<Optional<Ptr>>* value)
 ```
 
 #### Retrieving the results of invocation and error checking for static functions
@@ -383,13 +382,10 @@ since its internal implementation differs from one compiler to another.
 In order to make it possible to combine dynamic libraries produced with
 the different compilers, a *manual* error handling mechanism is used.
 
-Effectively, this means that **every Yet function must return** a some kind
-of `Result` structure instance. Such an instance **must contain** a member
-called `error` of type `Ptr`. In particular, functions with a `Void`
-return value will actually return a structure with an `error` member only.
+Effectively, this means that **every Yet function must return** some `Ptr`:
  * When an invocation is successful, it returns
-a `Result` with `error` equals to zero
- * In case of failure, `error` points to the instance of type `Error`
+   a `Ptr` which equals to zero
+ * In case of failure, it points to the instance of type `Error`
    which contains information relative to the occurred failure.
 
 It's a responsibility of each client of Yet functions to check its result
@@ -397,16 +393,9 @@ for errors.
 
 That's it for error handling. The actual function's result is passed
 according to the following rules:
- 1) Scalar primitive types are passed as is inside the aforementioned
-    `Result` structure (as its `value` member). There are dedicated
-    structures like `IntResult`, `BoolResult` and so on. In this case
-    you must specify **function** calling convention (`F`)
- 2) Functions which return nothing (i.e. `Void`) make use of `VoidResult`
-    structure and specify **procedure** calling convention (`P`)
- 3) Structure results are not returned. Instead, a client has to pass
-    a C-pointer to the destination structure as the **last** parameter.
-    In this case function gets a **procedure** calling convention.
-    This structure is usually allocated at client's stack before the
+ 1) Scalar primitives and structures are not returned. Instead, a client
+    has to pass a C-pointer to the destination buffer as the **last**
+    parameter. This buffer is usually allocated at client's stack before the
     function invocation. The function has to fill its fields with
     appropriate values:
 ```swift
@@ -418,18 +407,15 @@ according to the following rules:
         }
     }
 
-    // Yet.
-    // Note: it uses `VoidResult` because it doesn't return a point
-    // via the result's instance
-    VoidResult yet_shiftP__Point_1c0__1c0(EC* context, Point* point, Point* offset, Point* result) {
+    // Yet
+    Ptr yet_shiftF__Point_1c0__1c0(EC* context, Point* point, Point* offset, Point* result) {
         result->x = point->x + offset->x;
         result->y = point->y + offset->y;
-        return okResult();  // inline for `VoidResult{ 0 }`
+        return 0;
     }
 ```
- 4) Objects on heap are returned with a `PtrResult` which has its
-    `value` member set to `Ptr` pointing to the object and thus
-    **function** calling convention is used. The *callee side*
+ 2) Objects on heap are returned via `Ptr` buffer allocated at client's
+    stack (pretty the same as in a previous case). The *callee side*
     must ensure reference counter of this object is not less than 1 in order
     to keep it from early deallocation. There are three things that you have
     to keep in mind so as to prevent memory leaks:
@@ -444,42 +430,40 @@ according to the following rules:
        manually if you're going to return the pointer further. This is done
        with a `unprotect()` method:
 ```swift
-    PtrResult outer(Int argument) {
-        PtrResult result = inner(argument);
-        if (result.error) {
+    Ptr outer(Int argument, Ptr* result) {
+        Ptr value;
+        Ptr error = inner(argument, &value);
+        if (error) {
             // Error handling
         }
-        Ref ref = protect(result.value);
+        Ref ref = protect(value);
         // Some actions
-        return okResult(ref.unprotect());
+        *result = ref.unprotect();
+        return 0;
     }
 
     // Well, actually, if "Some actions" part is not present, you can
     // just return the result of inner function:
-    PtrResult outer(Int argument) {
-        PtrResult result = inner(argument);
-        if (result.error) {
+    Ptr outer(Int argument, Ptr* result) {
+        Ptr error = inner(argument, result);
+        if (error) {
             // Error handling
         }
-        return result;
+        return 0;
     }
 ```
- 5) Optionals of referential types are also returned via `PtrResult`
-    except for its `value` field can be set to zero in order to indicate
-    `none`. **Function** calling convention is used
- 6) Optionals of value types are returned via the last function's argument
-    which is a C-pointer to a desirable output value. The function itself
-    returns `BoolResult` in order to indicate whether the output value
-    was overwritten. **Procedure** calling convention is used:
+ 3) Optionals of referential types are also returned via `Ptr` buffer
+    except for its value can be set to zero in order to indicate `none`.
+ 4) Optionals of value types are returned just like the regular structures:
 ```swift
     func indexOf(ch: Char, s: String) -> Int?
     <=>
-    BoolResult yet_indexOfP__C_S__OI(EC* context, Char ch, Ptr s, Int* result);
+    Ptr yet_indexOfF__C_S__OI(EC* context, Char ch, Ptr s, Optional<Int>* result);
 ```
 
 #### Reduced functions
 Some of the Yet runtime's functions are not supposed to return any error.
-Such functions **don't wrap** their return value with a `Result` structure.
+Instead, such functions return their values as the regular C-functions.
 Also they don't need an `ExecutionContext` as their first argument.
 This calling convention is called **reduced** and denoted with `R`.
 
@@ -505,30 +489,37 @@ calling convention if and only if it's guaranteed to produce
 the program's execution.
 
 #### Dealing with generic functions
-Since generic functions are generated by a compiler on a client's side
-(and not exported from DLL), there is no need to follow the same rules
-for passing arguments and returning an invocation result. Instead:
- 1) **every argument** (except for execution context and `self` in case of
-    method invocations) is passed as is
- 2) **every resulting value** is returned as is wrapped with `Result<T>`
-    and thus **generic** (`G`) calling convention is used. This means
-    that even `Ptr`s are returned with either `Result<Ref>` or
-    `Result<Nullable>`.
+Since generic functions can expect arguments of some unknown type `T`
+which can be a primitive, a structure, an optional or even a reference
+it's important to handle all of these cases correctly.
 
-**Note:** it might be not immediately obvious which functions should be
-treated as the generic ones. Let's consider the following example:
-```swift
-// Re:Lite
-class BasicArray<E> {
-    func removeAt(index: Int)
-}
+There are some special generic structures from `InvocationUtil.h`
+that can be used in order to facilitate this task:
+ 1) `ArgumentInfo<T>::Type` will give an appropriate type for passing
+    an argument (e.g. `Ptr` for `Ref`, `struct*` for `struct`
+    and `Int` for `Int`)
+ 2) `ResultInfo<T>::Type*` will give an appropriate type for an *output*
+    parameter which is used as a function's result (e.g. `Ptr*` for `Ref`,
+    `Int*` for `Int` and so on). The pointer-less version can be used
+    in order to declare a *buffer* for function's output.
 
-// Mangled version
-BasicArray<E>::removeAtG__s_I__V(EC* context, Ptr self, Int index)
+A typical example might be the following:
+```cpp
+    // Add value to an array
+    Ptr BasicArray<E>::addF__s_t1__V(EC* context, Ptr self, typename ArgumentInfo<E>::Type value);
+
+    // Get value at index
+    Ptr BasicArray<E>::getF__operator__s_I__t1(EC* context, Ptr self, Int index, typename ResultInfo<E>::Type* result);
+
+    // Declare an output variable
+    {
+        ...
+        typename ResultInfo<E>::Type result;
+        BasicArray<E>::getF__operator__s_I__t1(context, array, index, &result);
+    }
 ```
-It's easy to see that there is no dependency on generic type `E` among
-actual argument types. Nevertheless this method uses **generic** calling
-convention since it's still *generated in place* and not exported. 
+
+You might want to use a macro `YET_ARG_TYPE(T)` which is basically `typename ArgumentInfo<T>::Type` and `YET_RES_TYPE(T)` instead of `typename ResultInfo<T>::Type` for the sake of simplicity as well.
 
 
 ### Memory management

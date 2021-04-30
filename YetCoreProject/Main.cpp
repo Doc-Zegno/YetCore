@@ -11,6 +11,7 @@
 #include "Allocator.h"
 #include "BasicArray.h"
 #include "StackFrame.h"
+#include "InvocationUtil.h"
 
 void* operator new(size_t size) {
     return Allocator::allocate((uintptr_t)size, false, false);
@@ -31,27 +32,32 @@ void runDemo(const char* name, std::function<void(void)> demo) {
 
 void demoModulePath() {
     runDemo("Module Path", [] {
-        auto result = yet_Module_pathF__get__V__PC8(nullptr);
-        if (result.error) {
-            std::cerr << "Error ptr: " << result.error << std::endl;
+        const char* path;
+        auto error = yet_Module_pathF__get__V__PC8(nullptr, &path);
+        if (error) {
+            std::cerr << "Error ptr: " << error << std::endl;
         } else {
-            std::cout << "Module path: '" << result.value << "'\n";
+            std::cout << "Module path: '" << path << "'\n";
         }
     });
 }
 
 void demoBasicArray() {
     runDemo("Basic Array", [] {
-        auto result = BasicArray<int>::__new__V__s(nullptr);
-        auto ptr = result.value;
+        Ptr ptr;
+        BasicArray<int>::__new__V__s(nullptr, &ptr);
         auto ref = protect(ptr);
         std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
-        BasicArray<int>::addG__s_t1__V(nullptr, ptr, 42);
-        BasicArray<int>::addG__s_t1__V(nullptr, ptr, 137);
+        BasicArray<int>::addF__s_t1__V(nullptr, ptr, 42);
+        BasicArray<int>::addF__s_t1__V(nullptr, ptr, 137);
         std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
-        std::cout << "Element #0: " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 0).value << std::endl;
-        std::cout << "Element #1: " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 1).value << std::endl;
-        std::cout << "Element #2: error? -> " << BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 2).error << std::endl;
+        int value;
+        BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 0, &value);
+        std::cout << "Element #0: " << value << std::endl;
+        BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 1, &value);
+        std::cout << "Element #1: " << value << std::endl;
+        auto error = BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 2, &value);
+        std::cout << "Element #2: error? -> " << error << std::endl;
 
         auto table = findTableOf<Any>(ptr);
         if (table->type == &yet_Any__type) {
@@ -71,14 +77,17 @@ void demoVector() {
 
 void demoBasicArrayNested() {
     runDemo("Basic Array Nested", [] {
-        auto result = BasicArray<Ref>::__new__V__s(nullptr);
-        auto ptr = result.value;
+        Ptr ptr;
+        BasicArray<Ref>::__new__V__s(nullptr, &ptr);
         auto ref = protect(ptr);
         for (auto i = 0; i < 6; i++) {
-            auto result = BasicArray<Ref>::__new__V__s(nullptr);
-            auto nestedPtr = result.value;
+            Ptr nestedPtr;
+            BasicArray<Ref>::__new__V__s(nullptr, &nestedPtr);
             auto nestedRef = protect(nestedPtr);
-            BasicArray<Ref>::addG__s_t1__V(nullptr, ptr, nestedRef);
+            BasicArray<Ref>::addF__s_t1__V(nullptr, ptr, nestedRef);
+            Ptr elementPtr;
+            BasicArray<Ref>::getF__operator__s_I__t1(nullptr, ptr, i, &elementPtr);
+            auto elementRef = protect(elementPtr);
         }
         std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
     });
@@ -117,11 +126,11 @@ void demoOptionalRef() {
     runDemo("Optional Ref", [] {
         auto nullable = Nullable();
         {
-            auto result = BasicArray<int>::__new__V__s(nullptr);
-            auto ptr = result.value;
+            Ptr ptr;
+            BasicArray<int>::__new__V__s(nullptr, &ptr);
             auto ref = protect(ptr);
             for (auto i = 0; i < 10; i++) {
-                BasicArray<int>::addG__s_t1__V(nullptr, ptr, i);
+                BasicArray<int>::addF__s_t1__V(nullptr, ptr, i);
             }
             std::cout << "Num allocated at start: " << Allocator::getAllocatedCount() << "\n";
             nullable = Nullable(ref);
@@ -152,6 +161,39 @@ void demoNested1(ExecutionContext* context) {
     });
 }
 
+template<typename TIn, typename TOut>
+void testMacro(YET_ARG_TYPE(TIn) in, YET_RES_TYPE(TOut)* out) {
+    // This function is not intended to do anything useful.
+    // It's only purpose is to enable VS IntelliSense
+    // in order to check that right function
+    // specializations are used
+}
+
+template<typename E>
+void testMacro(YET_ARG_TYPE(Optional<E>) optional) {
+    if (!optional) {
+        std::cout << "Optional is null\n";
+    } else {
+        std::cout << "Optional is not null\n";
+    }
+}
+
+void demoInvocationUtil() {
+    runDemo("Invocation Utilities", []() {
+        int intArg = 137;
+        bool boolResult;
+        testMacro<int, bool>(pass(intArg), &boolResult);
+        YET_RES_TYPE(Ref) refResult;
+        testMacro<int, Ref>(pass(intArg), &refResult);
+        Optional<int> optionalArg;
+        YET_RES_TYPE(Optional<bool>) optionalResult;
+        testMacro<Optional<int>, Optional<bool>>(pass(optionalArg), &optionalResult);
+        testMacro<int>(pass(optionalArg));
+        optionalArg = Optional<int>(intArg);
+        testMacro<int>(pass(optionalArg));
+    });
+}
+
 int main() {
     ExecutionContext* context = nullptr;
     StackFrame frame(context, __FUNCTION__);
@@ -164,6 +206,7 @@ int main() {
     demoOptionalRef();
     frame.setLineAfter(__LINE__);
     demoNested1(context);
+    demoInvocationUtil();
     printStackTrace(context);
     std::cout << "Any name: " << typeOf<Any>()->name << std::endl;
     std::cout << "Array name: " << BasicArray<int>::__typeHolder.type.name << std::endl;

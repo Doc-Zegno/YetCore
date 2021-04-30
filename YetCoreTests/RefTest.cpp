@@ -13,19 +13,20 @@ namespace YetCoreTests {
 		template<typename TFunction>
 		void runWithArray(const TFunction& function) {
 			runWithMemoryCheck([&function] {
-				auto result = BasicArray<Ref>::__new__V__s(nullptr);
-				auto ptr = result.value;
+				Ptr ptr;
+				BasicArray<Ref>::__new__V__s(nullptr, &ptr);
 				auto allocatedCount = Allocator::getAllocatedCount();
 				function(ptr, allocatedCount);
 			});
 		}
 
-		static PtrResult createIntArray(int first, int second) {
-			auto result = BasicArray<int>::__new__V__s(nullptr);
-			auto ref = protect(result.value);
-			BasicArray<int>::addG__s_t1__V(nullptr, ref.get(), first);
-			BasicArray<int>::addG__s_t1__V(nullptr, ref.get(), second);
-			return okResult(ref.unprotect());
+		static Ptr createIntArray(int first, int second) {
+			Ptr ptr;
+			BasicArray<int>::__new__V__s(nullptr, &ptr);
+			auto ref = protect(ptr);
+			BasicArray<int>::addF__s_t1__V(nullptr, ref.get(), first);
+			BasicArray<int>::addF__s_t1__V(nullptr, ref.get(), second);
+			return ref.unprotect();
 		}
 
 	public:
@@ -94,14 +95,14 @@ namespace YetCoreTests {
 
 		TEST_METHOD(BasicArrayNested) {
 			runWithMemoryCheck([] {
-				auto result = BasicArray<Ref>::__new__V__s(nullptr);
-				auto ptr = result.value;
+				Ptr ptr;
+				BasicArray<Ref>::__new__V__s(nullptr, &ptr);
 				auto ref = protect(ptr);
 				for (auto i = 0; i < 6; i++) {
-					auto result = BasicArray<Ref>::__new__V__s(nullptr);
-					auto nestedPtr = result.value;
+					Ptr nestedPtr;
+					auto result = BasicArray<Ref>::__new__V__s(nullptr, &nestedPtr);
 					auto nestedRef = protect(nestedPtr);
-					BasicArray<Ref>::addG__s_t1__V(nullptr, ptr, nestedRef);
+					BasicArray<Ref>::addF__s_t1__V(nullptr, ptr, nestedRef);
 				}
 				logAllocatedCount(__FUNCTION__);
 			});
@@ -112,12 +113,15 @@ namespace YetCoreTests {
 				auto startCount = Allocator::getAllocatedCount();
 				auto first = 137;
 				auto second = 42;
-				auto result = createIntArray(first, second);
-				auto ref = protect(result.value);
+				auto ptr = createIntArray(first, second);
+				auto ref = protect(ptr);
 				logAllocatedCount(__FUNCTION__);
 				Assert::IsTrue(Allocator::getAllocatedCount() > startCount, L"Array has been released too early");
-				Assert::AreEqual(first, BasicArray<int>::getG__operator__s_I__t1(nullptr, ref.get(), 0).value);
-				Assert::AreEqual(second, BasicArray<int>::getG__operator__s_I__t1(nullptr, ref.get(), 1).value);
+				int value;
+				BasicArray<int>::getF__operator__s_I__t1(nullptr, ref.get(), 0, &value);
+				Assert::AreEqual(first, value);
+				BasicArray<int>::getF__operator__s_I__t1(nullptr, ref.get(), 1, &value);
+				Assert::AreEqual(second, value);
 			});
 		}
 	};

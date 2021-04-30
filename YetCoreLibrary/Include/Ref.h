@@ -69,8 +69,9 @@ struct Ref {
 	/// </remarks>
 	/// <example>
 	/// <code>
-	/// auto result = yet_YourFunction__V__S();
-	/// auto s = protect(result.value);
+	/// Ptr value;
+	/// auto error = yet_YourFunction__V__S(&value);
+	/// auto s = protect(value);
 	/// ...
 	/// // The recommended approach:
 	/// return okResult(s.unprotect());
@@ -104,11 +105,12 @@ struct Ref {
 /// </remarks>
 /// <example>
 /// <code>
-/// auto result = yet_YourFunction__V__S();
-/// if (result.error) {
+/// Ptr value;
+/// auto error = yet_YourFunction__V__S(&value);
+/// if (error) {
 ///     ...
 /// }
-/// auto s = protect(result.value);
+/// auto s = protect(value);
 /// </code>
 /// </example>
 inline Ref protect(Ptr object) {

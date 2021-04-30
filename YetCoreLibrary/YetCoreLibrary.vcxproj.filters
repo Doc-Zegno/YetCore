@@ -27,9 +27,6 @@
     <ClInclude Include="Include\Module.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Result.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="Include\Ptr.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -64,6 +61,12 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Include\Optional.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\InvocationUtil.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\GenericUtil.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

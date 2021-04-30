@@ -13,8 +13,8 @@ namespace YetCoreTests {
         template<typename TFunction>
         void runWithArray(const TFunction& function) {
             runWithMemoryCheck([&function] {
-                auto result = BasicArray<int>::__new__V__s(nullptr);
-                auto ptr = result.value;
+                Ptr ptr;
+                BasicArray<int>::__new__V__s(nullptr, &ptr);
                 auto ref = protect(ptr);
                 function(ref);
             });
@@ -24,13 +24,16 @@ namespace YetCoreTests {
 		TEST_METHOD(BasicFunctionality) {
             runWithArray([](Ref ref) {
                 auto ptr = ref.get();
-                BasicArray<int>::addG__s_t1__V(nullptr, ptr, 42);
-                BasicArray<int>::addG__s_t1__V(nullptr, ptr, 137);
-                auto element0 = BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 0).value;
+                BasicArray<int>::addF__s_t1__V(nullptr, ptr, 42);
+                BasicArray<int>::addF__s_t1__V(nullptr, ptr, 137);
+                int element0;
+                BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 0, &element0);
                 Assert::AreEqual(42, element0);
-                auto element1 = BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 1).value;
+                int element1;
+                BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 1, &element1);
                 Assert::AreEqual(137, element1);
-                auto error = BasicArray<int>::getG__operator__s_I__t1(nullptr, ptr, 2).error;
+                int element2;
+                auto error = BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 2, &element2);
                 Assert::IsTrue(error);
             });
 		}
