@@ -69,6 +69,9 @@
     <ClInclude Include="Include\GenericUtil.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\PtrGuard.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

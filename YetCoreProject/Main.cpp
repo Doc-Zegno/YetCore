@@ -7,6 +7,7 @@
 #include "Ref.h"
 #include "PtrX.h"
 #include "Module.h"
+#include "PtrGuard.h"
 #include "Optional.h"
 #include "Allocator.h"
 #include "BasicArray.h"
@@ -44,22 +45,21 @@ void demoModulePath() {
 
 void demoBasicArray() {
     runDemo("Basic Array", [] {
-        Ptr ptr;
-        BasicArray<int>::__new__V__s(nullptr, &ptr);
-        auto ref = protect(ptr);
+        PtrGuard guard;
+        BasicArray<int>::__new__V__s(nullptr, &guard.ptr);
         std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
-        BasicArray<int>::addF__s_t1__V(nullptr, ptr, 42);
-        BasicArray<int>::addF__s_t1__V(nullptr, ptr, 137);
+        BasicArray<int>::addF__s_t1__V(nullptr, guard.ptr, 42);
+        BasicArray<int>::addF__s_t1__V(nullptr, guard.ptr, 137);
         std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
         int value;
-        BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 0, &value);
+        BasicArray<int>::getF__operator__s_I__t1(nullptr, guard.ptr, 0, &value);
         std::cout << "Element #0: " << value << std::endl;
-        BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 1, &value);
+        BasicArray<int>::getF__operator__s_I__t1(nullptr, guard.ptr, 1, &value);
         std::cout << "Element #1: " << value << std::endl;
-        auto error = BasicArray<int>::getF__operator__s_I__t1(nullptr, ptr, 2, &value);
+        auto error = BasicArray<int>::getF__operator__s_I__t1(nullptr, guard.ptr, 2, &value);
         std::cout << "Element #2: error? -> " << error << std::endl;
 
-        auto table = findTableOf<Any>(ptr);
+        auto table = findTableOf<Any>(guard.ptr);
         if (table->type == &yet_Any__type) {
             std::cout << "Found Any table at address: " << table->type << std::endl;
         }
@@ -77,17 +77,16 @@ void demoVector() {
 
 void demoBasicArrayNested() {
     runDemo("Basic Array Nested", [] {
-        Ptr ptr;
-        BasicArray<Ref>::__new__V__s(nullptr, &ptr);
-        auto ref = protect(ptr);
+        PtrGuard guard;
+        BasicArray<Ref>::__new__V__s(nullptr, &guard.ptr);
         for (auto i = 0; i < 6; i++) {
-            Ptr nestedPtr;
+            Ptr nestedPtr = 0;
             BasicArray<Ref>::__new__V__s(nullptr, &nestedPtr);
             auto nestedRef = protect(nestedPtr);
-            BasicArray<Ref>::addF__s_t1__V(nullptr, ptr, nestedRef);
-            Ptr elementPtr;
-            BasicArray<Ref>::getF__operator__s_I__t1(nullptr, ptr, i, &elementPtr);
-            auto elementRef = protect(elementPtr);
+            BasicArray<Ref>::addF__s_t1__V(nullptr, guard.ptr, nestedRef);
+            PtrGuard elementGuard;
+            BasicArray<Ref>::getF__operator__s_I__t1(nullptr, guard.ptr, i, &elementGuard.ptr);
+            std::cout << "Num allocated at step #" << i << ": " << Allocator::getAllocatedCount() << std::endl;
         }
         std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
     });
@@ -126,7 +125,7 @@ void demoOptionalRef() {
     runDemo("Optional Ref", [] {
         auto nullable = Nullable();
         {
-            Ptr ptr;
+            Ptr ptr = 0;
             BasicArray<int>::__new__V__s(nullptr, &ptr);
             auto ref = protect(ptr);
             for (auto i = 0; i < 10; i++) {

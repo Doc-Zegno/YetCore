@@ -3,6 +3,7 @@
 
 #include "Ref.h"
 #include "TestUtil.h"
+#include "PtrGuard.h"
 #include "BasicArray.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -13,7 +14,7 @@ namespace YetCoreTests {
 		template<typename TFunction>
 		void runWithArray(const TFunction& function) {
 			runWithMemoryCheck([&function] {
-				Ptr ptr;
+				Ptr ptr = 0;
 				BasicArray<Ref>::__new__V__s(nullptr, &ptr);
 				auto allocatedCount = Allocator::getAllocatedCount();
 				function(ptr, allocatedCount);
@@ -21,12 +22,11 @@ namespace YetCoreTests {
 		}
 
 		static Ptr createIntArray(int first, int second) {
-			Ptr ptr;
-			BasicArray<int>::__new__V__s(nullptr, &ptr);
-			auto ref = protect(ptr);
-			BasicArray<int>::addF__s_t1__V(nullptr, ref.get(), first);
-			BasicArray<int>::addF__s_t1__V(nullptr, ref.get(), second);
-			return ref.unprotect();
+			PtrGuard guard;
+			BasicArray<int>::__new__V__s(nullptr, &guard.ptr);
+			BasicArray<int>::addF__s_t1__V(nullptr, guard.ptr, first);
+			BasicArray<int>::addF__s_t1__V(nullptr, guard.ptr, second);
+			return guard.unprotect();
 		}
 
 	public:

@@ -415,29 +415,51 @@ according to the following rules:
     }
 ```
  2) Objects on heap are returned via `Ptr` buffer allocated at client's
-    stack (pretty the same as in a previous case). The *callee side*
+    stack (pretty the same as in a previous case). The *caller side*
+    must ensure this `Ptr` is initialized with some *reasonable* value.
+    Unless you are trying to optimize memory allocations, *reasonable*
+    should mean "zero" for you otherwise app can crash. The *callee side*
     must ensure reference counter of this object is not less than 1 in order
     to keep it from early deallocation. There are three things that you have
     to keep in mind so as to prevent memory leaks:
-     * The safest way of dealing with a referential results is to wrap
-       them with a `Ref` **immediately** using `protect()` function.
-       `Ref` has appropriate destructor which will automatically decrease
-       a reference counter on leaving the scope. Please, note: `protect()`
-       **doesn't** increase a counter so it won't become 2
-     * If for some reason you are not going to use `Ref` wrapper,
+     * The safest way of dealing with a referential results is either
+       to use `PtrGuard` or to wrap them with a `Ref` **immediately** using
+       `protect()` function. Both `PtrGuarg` and `Ref` have appropriate
+       destructors which will automatically decrease a reference counter
+       on leaving the scope.
+       The difference between them is that a code with `PtrGuard` is a bit
+       simpler to use and, what's more important, `PtrGuard` ensures that
+       guarded `Ptr` is zeroed before a function call. When using `Ref`,
+       you must zero your `Ptr` manually (see examples below).
+       Please, note: `protect()` **doesn't** increase a counter so
+       it won't become 2.
+     * If for some reason you are not going to use these wrappers,
        you can decrease the reference counter manually using `release()`
-     * Since `Ref` dtor will decrease the counter, you have to discard it
-       manually if you're going to return the pointer further. This is done
-       with a `unprotect()` method:
-```swift
+     * Since both `PtrGuard` and `Ref` dtors will decrease the counter,
+       you have to discard it manually if you're going to return the
+       pointer further. This is done with a `unprotect()` method:
+```cpp
+    // Using PtrGuard
     Ptr outer(Int argument, Ptr* result) {
-        Ptr value;
+        PtrGuard guard;
+        Ptr error = inner(argument, &guard.ptr);
+        if (error) {
+            // Error handling
+        }
+        // Some actions on `guard.ptr`
+        *result = guard.unprotect();
+        return 0;
+    }
+
+    // Using Ref
+    Ptr outer(Int argument, Ptr* result) {
+        Ptr value = 0;  // Zero it manually
         Ptr error = inner(argument, &value);
         if (error) {
             // Error handling
         }
         Ref ref = protect(value);
-        // Some actions
+        // Some actions on `value`
         *result = ref.unprotect();
         return 0;
     }

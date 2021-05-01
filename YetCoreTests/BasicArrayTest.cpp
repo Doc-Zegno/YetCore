@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 
-#include "Ref.h"
+#include "PtrGuard.h"
 #include "TestUtil.h"
 #include "BasicArray.h"
 
@@ -13,17 +13,15 @@ namespace YetCoreTests {
         template<typename TFunction>
         void runWithArray(const TFunction& function) {
             runWithMemoryCheck([&function] {
-                Ptr ptr;
-                BasicArray<int>::__new__V__s(nullptr, &ptr);
-                auto ref = protect(ptr);
-                function(ref);
+                PtrGuard guard;
+                BasicArray<int>::__new__V__s(nullptr, &guard.ptr);
+                function(guard.ptr);
             });
         }
 
 	public:
 		TEST_METHOD(BasicFunctionality) {
-            runWithArray([](Ref ref) {
-                auto ptr = ref.get();
+            runWithArray([](Ptr ptr) {
                 BasicArray<int>::addF__s_t1__V(nullptr, ptr, 42);
                 BasicArray<int>::addF__s_t1__V(nullptr, ptr, 137);
                 int element0;
