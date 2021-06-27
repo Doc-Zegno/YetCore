@@ -135,12 +135,17 @@ In order to address such cases, the following rules are used:
     func find<E, T>(e: E, t: T): T? <=>
         yet_2tfindF_t1_t2__t1_t2__Ot2()
 ```
- 5) All the prefices are applied in **the reversed order** (so prefix #4
+ 5) Referential arguments which are passed via **fat pointers** are
+    prepended with a special prefix `0f`:
+```swift
+    func append(s: String) <=> yet_appendF__0fS__V()
+``` 
+ 6) All the prefices are applied in **the reversed order** (so prefix #4
     goes before prefix #3):
 ```swift
     koalas.DataFrame<Int, String> <=> 2t2pkoalas_DataFrame_I_S
 ```
- 6) Builtin template types are written in the expanded form when used with
+ 7) Builtin template types are written in the expanded form when used with
     non-builtin types:
 ```swift
     // Short
@@ -159,7 +164,7 @@ In order to address such cases, the following rules are used:
     // Expanded nested (note: only one outermost type!)
     Array<Array<Images.Filter>> <=> 1tArray_1tArray_2pImages_Filter
 ```
- 7) Shorthand notation is used for parameter/return types that have common
+ 8) Shorthand notation is used for parameter/return types that have common
     parts with the full qualification of the method. Replace them with
     a `Nc` mnenomic (`N` common parts):
 ```swift
@@ -169,7 +174,7 @@ In order to address such cases, the following rules are used:
     MegaApp.Models.Util.createFrom(user: MegaApp.Models.User) <=>
         yet_MegaApp_Models_Util_createFromF__2p2c_User__V()
 ```
- 8) Similar shorthand is used when the common parts are borrowed from
+ 9) Similar shorthand is used when the common parts are borrowed from
     previous argument types. In this case a `NcI` mnemonic is used
     (`N` common parts with argument type #`I`, counting from zero):
 ```swift
@@ -177,7 +182,7 @@ In order to address such cases, the following rules are used:
     compare(user1: MegaApp.Models.User, user2: MegaApp.Models.User): Int <=>
         yet_compareF__3pMegaApp_Models_User_3c0__I()
 ```
- 9) The more common parts the better. That means, if an argument #1
+ 10) The more common parts the better. That means, if an argument #1
     has more common parts with an argument #0 than it has with a method's
     qualification, it must share them with a previous argument.
     Otherwise a full qualification (and then arguments with lower indices)
@@ -353,14 +358,25 @@ The following rules are used:
     function execution time. The quickiest and safest way to do that
     is to copy automatic reference onto your stack before invoking target
     method
- 4) Top-level `Optional<T>` where `T` is a value type is reduced to a
+ 4) When passing a reference to the instance of interface type,
+    caller side might increase callee's performance by suggesting
+    the correct *virtual table*. This is done via `FatPtr`
+    which is effectively a pair of two pointers (the first one is
+    the passed `Ptr` itself and the second one is the pointer to
+    the suggested virtual table):
+```swift
+    func print(value: Printable)
+    <=>
+    yet_printF__0fPrintable__V(EC* context, FatPtr value)
+```
+ 5) Top-level `Optional<T>` where `T` is a value type is reduced to a
     C-pointer which can be `NULL`:
 ```swift
     func setResolution(value: Int?)
     <=>
     yet_setResolutionF__OI__V(EC* context, Int* value)
 ```
- 5) Top-level `Optional<T>` where `T` is a referential type is reduced
+ 6) Top-level `Optional<T>` where `T` is a referential type is reduced
     to a `Ptr` which can be `0`
 
 Let's find out how the latest rules work in a bit complicated scenario:

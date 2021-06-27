@@ -162,6 +162,7 @@
     <ClInclude Include="Include\BasicArray.h" />
     <ClInclude Include="Include\ExecutionContext.h" />
     <ClInclude Include="Include\ExpressionLocation.h" />
+    <ClInclude Include="Include\FatPtr.h" />
     <ClInclude Include="Include\GenericUtil.h" />
     <ClInclude Include="Include\InvocationUtil.h" />
     <ClInclude Include="Include\Manageable.h" />
