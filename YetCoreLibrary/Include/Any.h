@@ -13,6 +13,7 @@ struct Any {
 	Type* __type;
 
 	enum class __Methods {
+		__box,
 	};
 };
 

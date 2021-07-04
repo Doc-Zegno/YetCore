@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YetCoreProject", "YetCoreProject\YetCoreProject.vcxproj", "{B791C66B-EC75-4D6F-B4C8-870CD1F2988C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6689467D-8E11-4A10-991C-2F4777500EEC} = {6689467D-8E11-4A10-991C-2F4777500EEC}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "YetCoreLibrary", "YetCoreLibrary\YetCoreLibrary.vcxproj", "{6689467D-8E11-4A10-991C-2F4777500EEC}"
 EndProject

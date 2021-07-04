@@ -52,6 +52,7 @@ struct BasicArray {
 
 	struct __TypeHolder {
 		FunctionPtr _ptrs[1] = {
+			nullptr,
 		};
 
 		VirtualTable _tables[1] = {

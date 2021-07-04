@@ -9,7 +9,7 @@ inline Type* getType(Ptr object) {
 }
 
 template<typename T>
-inline VirtualTable* findTableOf(Ptr object) {
+inline FunctionPtr* findTableOf(Ptr object) {
 	auto type = getType(object);
 	return type->findTableOf(typeOf<T>());
 }

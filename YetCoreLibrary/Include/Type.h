@@ -18,11 +18,11 @@ struct Type {
 	Type(DeinitPtr deinit, VirtualTable(&tables)[N], const char* name) :
 		deinit(deinit), tables(tables), tableCount(N), name(name) {}
 
-	VirtualTable* findTableOf(Type* type) {
+	FunctionPtr* findTableOf(Type* type) {
 		for (auto i = 0; i < tableCount; i++) {
 			auto table = &tables[i];
 			if (table->type == type) {
-				return table;
+				return table->ptrs;
 			}
 		}
 		return nullptr;

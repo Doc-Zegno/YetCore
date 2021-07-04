@@ -60,8 +60,8 @@ void demoBasicArray() {
         std::cout << "Element #2: error? -> " << error << std::endl;
 
         auto table = findTableOf<Any>(guard.ptr);
-        if (table->type == &yet_Any__type) {
-            std::cout << "Found Any table at address: " << table->type << std::endl;
+        if (table != nullptr) {
+            std::cout << "Found Any table at address: " << table << std::endl;
         }
     });
 }

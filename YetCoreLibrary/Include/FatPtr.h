@@ -37,14 +37,14 @@
 /// </remarks>
 struct FatPtr {
 	Ptr ptr;
-	VirtualTable* virtualTable;
+	FunctionPtr* table;
 
-	FatPtr(Ptr ptr, VirtualTable* virtualTable = nullptr) : ptr(ptr), virtualTable(virtualTable) {}
+	FatPtr(Ptr ptr, FunctionPtr* table = nullptr) : ptr(ptr), table(table) {}
 
 	template<typename T>
-	VirtualTable* findTableOf() {
-		if (virtualTable != nullptr) {
-			return virtualTable;
+	FunctionPtr* findTableOf() {
+		if (table != nullptr) {
+			return table;
 		} else {
 			return findTableOf<T>(ptr);
 		}
@@ -57,11 +57,12 @@ struct FatPtr {
 	/// the result of its invocation
 	/// </summary>
 	Ptr getStandalonePtr() {
-		if (virtualTable != nullptr) {
-			// TODO: box object, also check that virtual table actually contains boxing method
-			throw std::exception("Not implemented");
-		} else {
-			return ptr;
+		if (table != nullptr) {
+			auto boxPtr = (Ptr(*)(Ptr))table[int(Any::__Methods::__box)];
+			if (boxPtr != nullptr) {
+				return boxPtr(ptr);
+			}
 		}
+		return ptr;
 	}
 };
