@@ -13,7 +13,6 @@ struct Any {
 	Type* __type;
 
 	enum class __Methods {
-		__deinit,  // Virtual destructor
 	};
 };
 

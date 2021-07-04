@@ -52,16 +52,15 @@ struct BasicArray {
 
 	struct __TypeHolder {
 		FunctionPtr _ptrs[1] = {
-			&__deinit,
 		};
 
 		VirtualTable _tables[1] = {
-			VirtualTable{ &yet_Any__type, _ptrs, 1 },
+			createTableOf<Any>(_ptrs),
 		};
 
 		Type type{
+			&__deinit,
 			_tables,
-			1,
 			"Builtin.BasicArray",
 		};
 	};

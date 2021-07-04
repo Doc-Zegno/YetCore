@@ -1,21 +1,22 @@
 #pragma once
 
-#include <cstdint>
+#include "Ptr.h"
+#include "VirtualTable.h"
 
-struct Type;
-
-using FunctionPtr = void*;
-
-struct VirtualTable {
-	Type* type;
-	FunctionPtr* ptrs;
-	intptr_t ptrCount;
-};
+using DeinitPtr = void(*)(Ptr);
 
 struct Type {
+	DeinitPtr deinit;
 	VirtualTable* tables;
 	intptr_t tableCount;
 	const char* name;
+
+	Type(DeinitPtr deinit, VirtualTable* tables, intptr_t tableCount, const char* name) :
+		deinit(deinit), tables(tables), tableCount(tableCount), name(name) {}
+
+	template<intptr_t N>
+	Type(DeinitPtr deinit, VirtualTable(&tables)[N], const char* name) :
+		deinit(deinit), tables(tables), tableCount(N), name(name) {}
 
 	VirtualTable* findTableOf(Type* type) {
 		for (auto i = 0; i < tableCount; i++) {
