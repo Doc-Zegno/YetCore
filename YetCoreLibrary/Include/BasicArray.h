@@ -55,7 +55,7 @@ struct BasicArray {
 	}
 
 	static Ptr __new__V__s(EC* context, Ptr* result) {
-		auto place = Allocator::allocate(sizeof(BasicArray<E>));
+		auto place = Allocator::allocate<BasicArray<E>>();
 		auto error = __init__PV__V(context, place);
 		if (error) {
 			return error;

@@ -33,6 +33,11 @@ struct Allocator {
 		return yet_allocateR__U__PV(size);
 	}
 
+	template<typename T>
+	static void* allocate() {
+		return allocate(sizeof(T));
+	}
+
 	/// <summary>
 	/// Release the specified block of dynamic memory.
 	/// Its actual size is deduced by the means of runtime.

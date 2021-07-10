@@ -41,7 +41,7 @@ struct BasicArrayIterator {
 	}
 
 	static Ptr __new__1tBasicArray_t1_Pt1_Pt1__s(EC* context, Ptr array, E* start, E* end, Ptr* result) {
-		auto object = Allocator::allocate(sizeof(BasicArrayIterator<E>));
+		auto object = Allocator::allocate<BasicArrayIterator<E>>();
 		auto error = __init__PV_1tBasicArray_t1_Pt1_Pt1__V(context, object, array, start, end);
 		if (error) {
 			return error;
