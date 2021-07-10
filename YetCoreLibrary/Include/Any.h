@@ -12,8 +12,20 @@ struct Any {
 	Manageable __manageable;  // NOTE: you can't derive from this without losing a standard layout
 	Type* __type;
 
-	enum class __Methods {
-		__box,
+	struct __Methods {
+		struct Indices {
+			enum {
+				__box,
+			};
+		};
+
+		struct Signatures {
+			using __box = Ptr(*)(Ptr);
+		};
+
+		static Signatures::__box __box(FunctionPtr* table) {
+			return (Signatures::__box)table[Indices::__box];
+		}
 	};
 };
 

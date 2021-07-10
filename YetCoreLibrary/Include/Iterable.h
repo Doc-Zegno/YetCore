@@ -32,9 +32,21 @@
 /// </remarks>
 template<typename E>
 struct Iterable {
-	enum class __Methods {
-		__box,
-		iteratorF__get__s__1tIterator_t1,
+	struct __Methods {
+		struct Indices {
+			enum {
+				__box,
+				iteratorF__get__s__1tIterator_t1,
+			};
+		};
+
+		struct Signatures {
+			using iteratorF__get__s__1tIterator_t1 = Ptr(*)(EC*, Ptr, Ptr*);
+		};
+
+		static typename Signatures::iteratorF__get__s__1tIterator_t1 iteratorF__get__s__1tIterator_t1(FunctionPtr* table) {
+			return (typename Signatures::iteratorF__get__s__1tIterator_t1)table[Indices::iteratorF__get__s__1tIterator_t1];
+		}
 	};
 };
 

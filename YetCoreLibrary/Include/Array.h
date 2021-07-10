@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Iterable.h"
+#include "InvocationUtil.h"
 
 /// <summary>
 /// The trait for basic container with a random access getter.
@@ -33,12 +34,24 @@
 /// </remarks>
 template<typename E>
 struct Array {
-	enum class __Methods {
-		// Iterable
-		__box,
-		iteratorF__get__s__1tIterator_t1,
-		// Array
-		getF__operator__s_I__t1,
+	struct __Methods {
+		struct Indices {
+			enum {
+				// Iterable
+				__box,
+				iteratorF__get__s__1tIterator_t1,
+				// Array
+				getF__operator__s_I__t1,
+			};
+		};
+
+		struct Signatures {
+			using getF__operator__s_I__t1 = Ptr(*)(EC*, Ptr, int, YET_RES_TYPE(E)*);
+		};
+
+		static typename Signatures::getF__operator__s_I__t1 getF__operator__s_I__t1(FunctionPtr* table) {
+			return (typename Signatures::getF__operator__s_I__t1)table[Indices::getF__operator__s_I__t1];
+		}
 	};
 };
 

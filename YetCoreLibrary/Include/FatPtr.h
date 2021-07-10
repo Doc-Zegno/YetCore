@@ -58,7 +58,7 @@ struct FatPtr {
 	/// </summary>
 	Ptr getStandalonePtr() {
 		if (table != nullptr) {
-			auto boxPtr = (Ptr(*)(Ptr))table[int(Any::__Methods::__box)];
+			auto boxPtr = Any::__Methods::__box(table);
 			if (boxPtr != nullptr) {
 				return boxPtr(ptr);
 			}

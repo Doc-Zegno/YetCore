@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Any.h"
+#include "InvocationUtil.h"
 
 /// <summary>
 /// The abstraction of C-pointer to elements of C-array.
@@ -10,10 +11,27 @@
 /// </summary>
 template<typename E>
 struct Iterator {
-	enum class __Methods {
-		__box,
-		hasNextF__get__s__B,
-		nextF__get__s__t1,
+	struct __Methods {
+		struct Indices {
+			enum {
+				__box,
+				hasNextF__get__s__B,
+				nextF__get__s__t1,
+			};
+		};
+
+		struct Signatures {
+			using hasNextF__get__s__B = Ptr(*)(EC*, Ptr, bool*);
+			using nextF__get__s__t1 = Ptr(*)(EC*, Ptr, YET_RES_TYPE(E)*);
+		};
+
+		static typename Signatures::hasNextF__get__s__B hasNextF__get__s__B(FunctionPtr* table) {
+			return (typename Signatures::hasNextF__get__s__B)table[Indices::hasNextF__get__s__B];
+		}
+
+		static typename Signatures::nextF__get__s__t1 nextF__get__s__t1(FunctionPtr* table) {
+			return (typename Signatures::nextF__get__s__t1)table[Indices::nextF__get__s__t1];
+		}
 	};
 };
 

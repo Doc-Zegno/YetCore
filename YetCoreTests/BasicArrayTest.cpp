@@ -42,7 +42,7 @@ namespace YetCoreTests {
                 BasicArray<int>::addF__s_t1__V(nullptr, ptr, 137);
                 auto iterableTable = findTableOf<Iterable<int>>(ptr);
                 Assert::IsNotNull(iterableTable);
-                auto iteratorGet = (Ptr(*)(EC*, Ptr, Ptr*))iterableTable[int(Iterable<int>::__Methods::iteratorF__get__s__1tIterator_t1)];
+                auto iteratorGet = Iterable<int>::__Methods::iteratorF__get__s__1tIterator_t1(iterableTable);
                 Assert::IsNotNull((void*)iteratorGet);
                 PtrGuard iteratorGuard;
                 auto error1 = iteratorGet(nullptr, ptr, &iteratorGuard.ptr);
@@ -50,9 +50,9 @@ namespace YetCoreTests {
                 Assert::IsFalse(error1);
                 auto iteratorTable = findTableOf<Iterator<int>>(iteratorGuard.ptr);
                 Assert::IsNotNull(iteratorTable);
-                auto hasNextGet = (Ptr(*)(EC*, Ptr, bool*))iteratorTable[int(Iterator<int>::__Methods::hasNextF__get__s__B)];
+                auto hasNextGet = Iterator<int>::__Methods::hasNextF__get__s__B(iteratorTable);
                 Assert::IsNotNull((void*)hasNextGet);
-                auto nextGet = (Ptr(*)(EC*, Ptr, int*))iteratorTable[int(Iterator<int>::__Methods::nextF__get__s__t1)];
+                auto nextGet = Iterator<int>::__Methods::nextF__get__s__t1(iteratorTable);
                 Assert::IsNotNull((void*)nextGet);
                 
                 auto hasNext = false;

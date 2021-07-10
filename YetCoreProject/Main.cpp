@@ -73,7 +73,7 @@ void demoBasicArrayVirtualDispatch() {
         auto iterableTable = findTableOf<Iterable<int>>(guard.ptr);
         if (iterableTable != nullptr) {
             std::cout << "Found Iterable<int> table at address: " << iterableTable << std::endl;
-            auto iteratorPtr = (Ptr(*)(EC*, Ptr, Ptr*))iterableTable[int(Iterable<int>::__Methods::iteratorF__get__s__1tIterator_t1)];
+            auto iteratorPtr = Iterable<int>::__Methods::iteratorF__get__s__1tIterator_t1(iterableTable);
             std::cout << "Iterator's getter: " << iteratorPtr << std::endl;
             if (iteratorPtr != nullptr) {
                 PtrGuard iteratorGuard;
@@ -82,8 +82,8 @@ void demoBasicArrayVirtualDispatch() {
                 std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
                 auto iteratorTable = findTableOf<Iterator<int>>(iteratorGuard.ptr);
                 if (iteratorTable != nullptr) {
-                    auto hasNextPtr = (Ptr(*)(EC*, Ptr, bool*))iteratorTable[int(Iterator<int>::__Methods::hasNextF__get__s__B)];
-                    auto nextPtr = (Ptr(*)(EC*, Ptr, int*))iteratorTable[int(Iterator<int>::__Methods::nextF__get__s__t1)];
+                    auto hasNextPtr = Iterator<int>::__Methods::hasNextF__get__s__B(iteratorTable);
+                    auto nextPtr = Iterator<int>::__Methods::nextF__get__s__t1(iteratorTable);
                     auto hasNext = false;
                     while (true) {
                         hasNextPtr(nullptr, iteratorGuard.ptr, &hasNext);
@@ -101,9 +101,9 @@ void demoBasicArrayVirtualDispatch() {
         auto arrayTable = findTableOf<Array<int>>(guard.ptr);
         if (arrayTable != nullptr) {
             std::cout << "Found Array<int> table at address: " << arrayTable << std::endl;
-            auto boxPtr = arrayTable[int(Array<int>::__Methods::__box)];
+            auto boxPtr = Any::__Methods::__box(arrayTable);
             std::cout << "Boxing: " << boxPtr << std::endl;
-            auto getPtr = (Ptr(*)(EC*, Ptr, int, int*))arrayTable[int(Array<int>::__Methods::getF__operator__s_I__t1)];
+            auto getPtr = Array<int>::__Methods::getF__operator__s_I__t1(arrayTable);
             std::cout << "Getter: " << getPtr << std::endl;
             if (getPtr != nullptr) {
                 int value;
