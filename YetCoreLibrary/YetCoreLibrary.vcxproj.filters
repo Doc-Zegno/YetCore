@@ -78,6 +78,18 @@
     <ClInclude Include="Include\VirtualTable.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Array.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Iterable.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Iterator.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\BasicArrayIterator.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -99,6 +111,15 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\ExecutionContext.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Array.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Iterable.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Iterator.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

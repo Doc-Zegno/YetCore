@@ -160,11 +160,15 @@
     <ClInclude Include="Include\Any.h" />
     <ClInclude Include="Include\Api.h" />
     <ClInclude Include="Include\BasicArray.h" />
+    <ClInclude Include="Include\BasicArrayIterator.h" />
     <ClInclude Include="Include\ExecutionContext.h" />
     <ClInclude Include="Include\ExpressionLocation.h" />
     <ClInclude Include="Include\FatPtr.h" />
     <ClInclude Include="Include\GenericUtil.h" />
     <ClInclude Include="Include\InvocationUtil.h" />
+    <ClInclude Include="Include\Array.h" />
+    <ClInclude Include="Include\Iterable.h" />
+    <ClInclude Include="Include\Iterator.h" />
     <ClInclude Include="Include\Manageable.h" />
     <ClInclude Include="Include\Module.h" />
     <ClInclude Include="Include\Optional.h" />
@@ -187,7 +191,10 @@
     </ClCompile>
     <ClCompile Include="Source\Allocator.cpp" />
     <ClCompile Include="Source\Any.cpp" />
+    <ClCompile Include="Source\Array.cpp" />
     <ClCompile Include="Source\ExecutionContext.cpp" />
+    <ClCompile Include="Source\Iterable.cpp" />
+    <ClCompile Include="Source\Iterator.cpp" />
     <ClCompile Include="Source\Module.cpp" />
     <ClCompile Include="Source\PtrX.cpp" />
   </ItemGroup>

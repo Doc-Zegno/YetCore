@@ -2,14 +2,33 @@
 
 #include <vector>
 
-#include "Any.h"
+#include "Array.h"
+#include "PtrGuard.h"
 #include "Allocator.h"
 #include "InvocationUtil.h"
+#include "BasicArrayIterator.h"
 
 template<typename E>
 struct BasicArray {
 	Any __base;
 	std::vector<E> _elements;
+
+	static Ptr iteratorF__get__s__1tIterator_t1(EC* context, Ptr self, Ptr* result) {
+		auto basicArray = (BasicArray<E>*)self;
+		auto& elements = basicArray->_elements;
+		E* start;
+		E* end;
+		if (elements.empty()) {
+			start = nullptr;
+			end = nullptr;
+		} else {
+			auto count = elements.size();
+			start = &elements[0];
+			end = &elements[count - 1] + 1;  // Prevent debugger's warnings in case of out of range &elements[count]
+		}
+		auto error = BasicArrayIterator<E>::__new__1tBasicArray_t1_Pt1_Pt1__s(context, self, start, end, result);
+		return error;
+	}
 
 	static Ptr addF__s_t1__V(EC* context, Ptr self, E element) {
 		auto basicArray = (BasicArray<E>*)self;
@@ -51,12 +70,26 @@ struct BasicArray {
 	}
 
 	struct __TypeHolder {
-		FunctionPtr _ptrs[1] = {
+		// TODO: merge them into one
+		FunctionPtr _anyPtrs[1] = {
 			nullptr,
 		};
 
-		VirtualTable _tables[1] = {
-			createTableOf<Any>(_ptrs),
+		FunctionPtr _iterablePtrs[2] = {
+			nullptr,
+			&iteratorF__get__s__1tIterator_t1,
+		};
+
+		FunctionPtr _arrayPtrs[3] = {
+			nullptr,
+			&iteratorF__get__s__1tIterator_t1,
+			&getF__operator__s_I__t1,
+		};
+
+		VirtualTable _tables[3] = {
+			createTableOf<Any>(_anyPtrs),
+			createTableOf<Iterable<E>>(_iterablePtrs),
+			createTableOf<Array<E>>(_arrayPtrs),
 		};
 
 		Type type{

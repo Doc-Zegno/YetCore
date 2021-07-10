@@ -58,10 +58,62 @@ void demoBasicArray() {
         std::cout << "Element #1: " << value << std::endl;
         auto error = BasicArray<int>::getF__operator__s_I__t1(nullptr, guard.ptr, 2, &value);
         std::cout << "Element #2: error? -> " << error << std::endl;
+    });
+}
 
-        auto table = findTableOf<Any>(guard.ptr);
-        if (table != nullptr) {
-            std::cout << "Found Any table at address: " << table << std::endl;
+void demoBasicArrayVirtualDispatch() {
+    runDemo("Basic Array Virtual Dispatch", [] {
+        PtrGuard guard;
+        BasicArray<int>::__new__V__s(nullptr, &guard.ptr);
+        std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
+        BasicArray<int>::addF__s_t1__V(nullptr, guard.ptr, 42);
+        BasicArray<int>::addF__s_t1__V(nullptr, guard.ptr, 137);
+        std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
+
+        auto iterableTable = findTableOf<Iterable<int>>(guard.ptr);
+        if (iterableTable != nullptr) {
+            std::cout << "Found Iterable<int> table at address: " << iterableTable << std::endl;
+            auto iteratorPtr = (Ptr(*)(EC*, Ptr, Ptr*))iterableTable[int(Iterable<int>::__Methods::iteratorF__get__s__1tIterator_t1)];
+            std::cout << "Iterator's getter: " << iteratorPtr << std::endl;
+            if (iteratorPtr != nullptr) {
+                PtrGuard iteratorGuard;
+                iteratorPtr(nullptr, guard.ptr, &iteratorGuard.ptr);
+                std::cout << "Iterator: " << (void*)iteratorGuard.ptr << std::endl;
+                std::cout << "Num allocated: " << Allocator::getAllocatedCount() << std::endl;
+                auto iteratorTable = findTableOf<Iterator<int>>(iteratorGuard.ptr);
+                if (iteratorTable != nullptr) {
+                    auto hasNextPtr = (Ptr(*)(EC*, Ptr, bool*))iteratorTable[int(Iterator<int>::__Methods::hasNextF__get__s__B)];
+                    auto nextPtr = (Ptr(*)(EC*, Ptr, int*))iteratorTable[int(Iterator<int>::__Methods::nextF__get__s__t1)];
+                    auto hasNext = false;
+                    while (true) {
+                        hasNextPtr(nullptr, iteratorGuard.ptr, &hasNext);
+                        if (!hasNext) {
+                            break;
+                        }
+                        auto next = 0;
+                        nextPtr(nullptr, iteratorGuard.ptr, &next);
+                        std::cout << "    next: " << next << std::endl;
+                    }
+                }
+            }
+        }
+
+        auto arrayTable = findTableOf<Array<int>>(guard.ptr);
+        if (arrayTable != nullptr) {
+            std::cout << "Found Array<int> table at address: " << arrayTable << std::endl;
+            auto boxPtr = arrayTable[int(Array<int>::__Methods::__box)];
+            std::cout << "Boxing: " << boxPtr << std::endl;
+            auto getPtr = (Ptr(*)(EC*, Ptr, int, int*))arrayTable[int(Array<int>::__Methods::getF__operator__s_I__t1)];
+            std::cout << "Getter: " << getPtr << std::endl;
+            if (getPtr != nullptr) {
+                int value;
+                Ptr error;
+                for (int i = 0; i < 3; i++) {
+                    error = getPtr(nullptr, guard.ptr, i, &value);
+                    std::cout << "Element #" << i << ": " << value << std::endl;
+                    std::cout << "    error: " << error << std::endl;
+                }
+            }
         }
     });
 }
@@ -199,6 +251,7 @@ int main() {
     std::cout << std::boolalpha;
     demoModulePath();
     demoBasicArray();
+    demoBasicArrayVirtualDispatch();
     demoVector();
     demoBasicArrayNested();
     demoOptionalString();
