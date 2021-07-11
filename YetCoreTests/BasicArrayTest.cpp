@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 
+#include <initializer_list>
+
 #include "PtrGuard.h"
 #include "TestUtil.h"
 #include "BasicArray.h"
@@ -16,6 +18,16 @@ namespace YetCoreTests {
                 PtrGuard guard;
                 BasicArray<int>::__new__V__s(nullptr, &guard.ptr);
                 function(guard.ptr);
+            });
+        }
+
+        template<typename TFunction>
+        void runWithArray(const std::initializer_list<int>& values, const TFunction& function) {
+            runWithArray([&values, &function](Ptr ptr) {
+                for (auto value : values) {
+                    BasicArray<int>::addF__s_t1__V(nullptr, ptr, value);
+                }
+                function(ptr);
             });
         }
 
@@ -37,9 +49,7 @@ namespace YetCoreTests {
 		}
 
         TEST_METHOD(IterableImplementation) {
-            runWithArray([](Ptr ptr) {
-                BasicArray<int>::addF__s_t1__V(nullptr, ptr, 42);
-                BasicArray<int>::addF__s_t1__V(nullptr, ptr, 137);
+            runWithArray({ 42, 137 }, [](Ptr ptr) {
                 auto iterableTable = findTableOf<Iterable<int>>(ptr);
                 Assert::IsNotNull(iterableTable);
                 auto iteratorGet = Iterable<int>::__Methods::iteratorF__get__s__1tIterator_t1(iterableTable);
@@ -76,6 +86,22 @@ namespace YetCoreTests {
                 Assert::IsFalse(error6);
                 auto error7 = nextGet(nullptr, iteratorGuard.ptr, &next);
                 Assert::IsTrue(error7);
+            });
+        }
+
+        TEST_METHOD(ArrayImplementationDecompose) {
+            runWithArray({ 42, 137 }, [](Ptr ptr) {
+                auto table = findTableOf<Array<int>>(ptr);
+                Assert::IsNotNull(table);
+                auto decompose = Array<int>::__Methods::decomposeR__s_1tPointer_ArrayFragment_I__I(table);
+                Assert::IsNotNull((void*)decompose);
+                ArrayFragment fragments[3];
+                auto fragmentCount = decompose(ptr, fragments, 3);
+                Assert::AreEqual(intptr_t(1), fragmentCount);
+                Assert::AreEqual(intptr_t(2), fragments[0].length);
+                auto values = (int*)fragments[0].start;
+                Assert::AreEqual(42, values[0]);
+                Assert::AreEqual(137, values[1]);
             });
         }
 	};

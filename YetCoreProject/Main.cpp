@@ -114,6 +114,20 @@ void demoBasicArrayVirtualDispatch() {
                     std::cout << "    error: " << error << std::endl;
                 }
             }
+
+            auto decompose = Array<int>::__Methods::decomposeR__s_1tPointer_ArrayFragment_I__I(arrayTable);
+            if (decompose != nullptr) {
+                std::cout << "Decomposition:\n";
+                ArrayFragment fragments[3];
+                auto fragmentCount = decompose(guard.ptr, fragments, 3);
+                std::cout << "    fragment count: " << fragmentCount << "\n";
+                for (auto i = 0; i < fragmentCount; i++) {
+                    std::cout << "    fragment #" << i << ":\n";
+                    for (auto j = 0; j < fragments[i].length; j++) {
+                        std::cout << "        " << ((int*)fragments[i].start)[j] << "\n";
+                    }
+                }
+            }
         }
     });
 }

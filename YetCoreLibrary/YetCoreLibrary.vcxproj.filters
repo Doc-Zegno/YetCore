@@ -90,6 +90,9 @@
     <ClInclude Include="Include\BasicArrayIterator.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\ArrayFragment.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

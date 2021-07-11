@@ -30,6 +30,17 @@ struct BasicArray {
 		return error;
 	}
 
+	static intptr_t decomposeR__s_1tPointer_ArrayFragment_I__I(Ptr self, ArrayFragment* fragments, intptr_t fragmentCount) {
+		if (fragmentCount < 1) {
+			return -1;
+		}
+		auto basicArray = (BasicArray<E>*)self;
+		auto& elements = basicArray->_elements;
+		fragments->length = intptr_t(elements.size());
+		fragments->start = const_cast<E*>(elements.data());
+		return 1;
+	}
+
 	static Ptr addF__s_t1__V(EC* context, Ptr self, E element) {
 		auto basicArray = (BasicArray<E>*)self;
 		basicArray->_elements.push_back(element);
@@ -80,9 +91,10 @@ struct BasicArray {
 			&iteratorF__get__s__1tIterator_t1,
 		};
 
-		FunctionPtr _arrayPtrs[3] = {
+		FunctionPtr _arrayPtrs[4] = {
 			nullptr,
 			&iteratorF__get__s__1tIterator_t1,
+			&decomposeR__s_1tPointer_ArrayFragment_I__I,
 			&getF__operator__s_I__t1,
 		};
 
