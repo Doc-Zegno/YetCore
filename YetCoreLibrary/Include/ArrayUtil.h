@@ -14,7 +14,7 @@ struct LocalArray {
 	LocalArray(E(&elements)[N]) : elements(elements), elementCount(N) {}
 
 	FatPtr toFatPtr() {
-		return FatPtr(Ptr(this), __typeHolder._arrayPtrs);
+		return FatPtr(Ptr(this), __typeHolder._arrayPtrs, /* isLocal */ true);
 	}
 
 	static intptr_t decomposeR__s_1tPointer_ArrayFragment_I__I(Ptr self, ArrayFragment* fragments, intptr_t fragmentCount) {

@@ -37,19 +37,24 @@
 /// </remarks>
 struct FatPtr {
 	Ptr ptr;
-	FunctionPtr* table;
+	Ptr taggedTable;
 
-	FatPtr(Ptr ptr, FunctionPtr* table = nullptr) : ptr(ptr), table(table) {}
+	FatPtr(Ptr ptr, FunctionPtr* table = nullptr) : ptr(ptr), taggedTable(Ptr(table)) {}
+
+	FatPtr(Ptr ptr, FunctionPtr* table, bool isLocal) : ptr(ptr), taggedTable(Ptr(table) | Ptr(isLocal)) {}
+
+	FatPtr(Ptr ptr, nullptr_t table, bool isLocal) = delete;
 
 	template<typename T>
 	FunctionPtr* findTableOf() {
-		if (table != nullptr) {
-			return table;
+		if (taggedTable) {
+			return (FunctionPtr*)(taggedTable & ~Ptr(1));
 		} else {
 			return ::findTableOf<T>(ptr);
 		}
 	}
 
+	// TODO: change signature (so it's capable of returning an error instance)
 	/// <summary>
 	/// Get an instance of <c>Ptr</c> which can be used independently without
 	/// a corresponding virtual table. This operation can allocate
@@ -57,11 +62,13 @@ struct FatPtr {
 	/// the result of its invocation
 	/// </summary>
 	Ptr getStandalonePtr() {
-		if (table != nullptr) {
+		if (taggedTable & Ptr(1)) {
+			auto table = (FunctionPtr*)(taggedTable & ~Ptr(1));
 			auto boxPtr = Any::__Methods::__box(table);
 			if (boxPtr != nullptr) {
 				return boxPtr(ptr);
 			}
+			// TODO: else raise error (missing box method)
 		}
 		return ptr;
 	}
