@@ -93,6 +93,9 @@
     <ClInclude Include="Include\ArrayFragment.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\ArrayUtil.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

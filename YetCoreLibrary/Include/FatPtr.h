@@ -46,7 +46,7 @@ struct FatPtr {
 		if (table != nullptr) {
 			return table;
 		} else {
-			return findTableOf<T>(ptr);
+			return ::findTableOf<T>(ptr);
 		}
 	}
 

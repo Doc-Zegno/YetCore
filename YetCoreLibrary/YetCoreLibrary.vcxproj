@@ -160,6 +160,7 @@
     <ClInclude Include="Include\Any.h" />
     <ClInclude Include="Include\Api.h" />
     <ClInclude Include="Include\ArrayFragment.h" />
+    <ClInclude Include="Include\ArrayUtil.h" />
     <ClInclude Include="Include\BasicArray.h" />
     <ClInclude Include="Include\BasicArrayIterator.h" />
     <ClInclude Include="Include\ExecutionContext.h" />

@@ -41,6 +41,12 @@ struct BasicArray {
 		return 1;
 	}
 
+	static Ptr countF__get__s__I(EC* context, Ptr self, intptr_t* result) {
+		auto basicArray = (BasicArray<E>*)self;
+		*result = intptr_t(basicArray->_elements.size());
+		return 0;
+	}
+
 	static Ptr addF__s_t1__V(EC* context, Ptr self, E element) {
 		auto basicArray = (BasicArray<E>*)self;
 		basicArray->_elements.push_back(element);
@@ -91,10 +97,11 @@ struct BasicArray {
 			&iteratorF__get__s__1tIterator_t1,
 		};
 
-		FunctionPtr _arrayPtrs[4] = {
+		FunctionPtr _arrayPtrs[5] = {
 			nullptr,
 			&iteratorF__get__s__1tIterator_t1,
 			&decomposeR__s_1tPointer_ArrayFragment_I__I,
+			&countF__get__s__I,
 			&getF__operator__s_I__t1,
 		};
 

@@ -43,17 +43,23 @@ struct Array {
 				iteratorF__get__s__1tIterator_t1,
 				// Array
 				decomposeR__s_1tPointer_ArrayFragment_I__I,
+				countF__get__s__I,
 				getF__operator__s_I__t1,
 			};
 		};
 
 		struct Signatures {
 			using decomposeR__s_1tPointer_ArrayFragment_I__I = intptr_t(*)(Ptr, ArrayFragment*, intptr_t);
+			using countF__get__s__I = Ptr(*)(EC*, Ptr, intptr_t*);
 			using getF__operator__s_I__t1 = Ptr(*)(EC*, Ptr, int, YET_RES_TYPE(E)*);
 		};
 
 		static typename Signatures::decomposeR__s_1tPointer_ArrayFragment_I__I decomposeR__s_1tPointer_ArrayFragment_I__I(FunctionPtr* table) {
 			return (typename Signatures::decomposeR__s_1tPointer_ArrayFragment_I__I)table[Indices::decomposeR__s_1tPointer_ArrayFragment_I__I];
+		}
+
+		static typename Signatures::countF__get__s__I countF__get__s__I(FunctionPtr* table) {
+			return (typename Signatures::countF__get__s__I)table[Indices::countF__get__s__I];
 		}
 
 		static typename Signatures::getF__operator__s_I__t1 getF__operator__s_I__t1(FunctionPtr* table) {

@@ -6,10 +6,12 @@
 #include "Any.h"
 #include "Ref.h"
 #include "PtrX.h"
+#include "FatPtr.h"
 #include "Module.h"
 #include "PtrGuard.h"
 #include "Optional.h"
 #include "Allocator.h"
+#include "ArrayUtil.h"
 #include "BasicArray.h"
 #include "StackFrame.h"
 #include "InvocationUtil.h"
@@ -129,6 +131,31 @@ void demoBasicArrayVirtualDispatch() {
                 }
             }
         }
+    });
+}
+
+void printArray(FatPtr fatPtr) {
+    auto table = fatPtr.findTableOf<Array<int>>();
+    if (table != nullptr) {
+        auto countGet = Array<int>::__Methods::countF__get__s__I(table);
+        auto getOperator = Array<int>::__Methods::getF__operator__s_I__t1(table);
+        intptr_t count = 0;
+        countGet(nullptr, fatPtr.ptr, &count);
+        std::cout << "Array contents:\n";
+        for (auto i = 0; i < count; i++) {
+            int value;
+            getOperator(nullptr, fatPtr.ptr, i, &value);
+            std::cout << "    " << value << "\n";
+        }
+    }
+}
+
+void demoFatPtrArray() {
+    runDemo("Array Virtual Dispatch via Fat Ptr", [] {
+        int values[] = { 2, 3, 5, 7, 11, 13, 17 };
+        LocalArray<int> localArray(values);
+        printArray(localArray.toFatPtr());
+        std::cout << "Num allocated: " << Allocator::getAllocatedCount() << "\n";
     });
 }
 
@@ -266,6 +293,7 @@ int main() {
     demoModulePath();
     demoBasicArray();
     demoBasicArrayVirtualDispatch();
+    demoFatPtrArray();
     demoVector();
     demoBasicArrayNested();
     demoOptionalString();
