@@ -7,6 +7,7 @@
 #include "TestUtil.h"
 #include "ArrayUtil.h"
 #include "BasicArray.h"
+#include "FatPtrGuard.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -16,9 +17,9 @@ namespace YetCoreTests {
         template<typename TFunction>
         void runWithBasicArray(const TFunction& function) {
             runWithMemoryCheck([&function] {
-                PtrGuard guard;
-                BasicArray<int>::__new__V__s(nullptr, &guard.ptr);
-                function(FatPtr(guard.ptr, BasicArray<int>::__typeHolder._arrayPtrs));
+                FatPtrGuard guard;
+                BasicArray<int>::__new__V__0fs(nullptr, &guard.fatPtr);
+                function(guard.fatPtr);
             });
         }
 

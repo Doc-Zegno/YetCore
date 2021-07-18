@@ -45,10 +45,27 @@ struct FatPtr {
 
 	FatPtr(Ptr ptr, nullptr_t table, bool isLocal) = delete;
 
+	void setTable(FunctionPtr* table, bool isLocal = false) {
+		taggedTable = Ptr(table) | Ptr(isLocal);
+	}
+
+	void clear() {
+		taggedTable = 0;
+		ptr = 0;
+	}
+
+	bool isLocal() {
+		return taggedTable & Ptr(1);
+	}
+
+	FunctionPtr* getTableWithoutTag() {
+		return (FunctionPtr*)(taggedTable & ~Ptr(1));
+	}
+
 	template<typename T>
 	FunctionPtr* findTableOf() {
 		if (taggedTable) {
-			return (FunctionPtr*)(taggedTable & ~Ptr(1));
+			return getTableWithoutTag();
 		} else {
 			return ::findTableOf<T>(ptr);
 		}
@@ -62,8 +79,8 @@ struct FatPtr {
 	/// the result of its invocation
 	/// </summary>
 	Ptr getStandalonePtr() {
-		if (taggedTable & Ptr(1)) {
-			auto table = (FunctionPtr*)(taggedTable & ~Ptr(1));
+		if (isLocal()) {
+			auto table = getTableWithoutTag();
 			auto boxPtr = Any::__Methods::__box(table);
 			if (boxPtr != nullptr) {
 				return boxPtr(ptr);

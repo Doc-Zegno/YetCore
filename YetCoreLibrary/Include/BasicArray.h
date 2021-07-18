@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Array.h"
+#include "FatPtr.h"
 #include "PtrGuard.h"
 #include "Allocator.h"
 #include "InvocationUtil.h"
@@ -78,6 +79,15 @@ struct BasicArray {
 			return error;
 		}
 		*result = Ptr(place);
+		return 0;
+	}
+
+	static Ptr __new__V__0fs(EC* context, FatPtr* result) {
+		auto error = __new__V__s(context, &result->ptr);
+		if (error) {
+			return error;
+		}
+		result->setTable(__typeHolder._arrayPtrs);
 		return 0;
 	}
 
