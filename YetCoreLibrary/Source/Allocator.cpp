@@ -7,22 +7,19 @@ namespace {
 	std::atomic<intptr_t> allocatedCount = 0;
 }
 
-void* yet_allocateR__U_B_B__PV(uintptr_t size, bool isManageable, bool canUseStack) {
+void* yet_allocateR__U_U_U__PV(uintptr_t size, uintptr_t options, uintptr_t placeHint) {
 	// TODO: implement path when stack placement is used
 	// TODO: use custom memory manager
-	auto p = calloc(1, (size_t)size);
-	if (p) {
-		if (isManageable) {
-			auto manageable = (Manageable*)p;
-			manageable->__refCount = 1;
-		}
-		allocatedCount++;
+	void* result;
+	if (options & Allocator::Options::WITHOUT_ZEROING) {
+		result = malloc((size_t)size);
+	} else {
+		result = calloc(1, (size_t)size);
 	}
-	return p;
-}
-
-void* yet_allocateR__U__PV(uintptr_t size) {
-	return yet_allocateR__U_B_B__PV(size, true, false);
+	if (result) {
+		allocatedCount++;  // TODO: a bottleneck. Consider using a per-thread counter
+	}
+	return result;
 }
 
 void yet_deallocateR__PV__V(void* object) {
