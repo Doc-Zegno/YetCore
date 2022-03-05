@@ -2,7 +2,7 @@
 
 #include "Ref.h"
 #include "Iterator.h"
-#include "Allocator.h"
+#include "AllocatorUtil.h"
 #include "InvocationUtil.h"
 
 template<typename E>
@@ -33,18 +33,20 @@ struct BasicArrayIterator {
 		}
 	}
 
-	static Ptr __init__PV_1tBasicArray_t1_Pt1_Pt1__V(EC* context, void* object, Ptr array, E* start, E* end) {
-		new(object) BasicArrayIterator<E>(array, start, end);
+	static Ptr __init__s_1tBasicArray_t1_Pt1_Pt1__V(EC* context, Ptr self, Ptr array, E* start, E* end) {
+		new((void*)self) BasicArrayIterator<E>(array, start, end);
 		return 0;
 	}
 
 	static Ptr __new__1tBasicArray_t1_Pt1_Pt1__s(EC* context, Ptr array, E* start, E* end, Ptr* result) {
-		auto object = Allocator::allocate<BasicArrayIterator<E>>();
-		auto error = __init__PV_1tBasicArray_t1_Pt1_Pt1__V(context, object, array, start, end);
+		auto error = Allocator::allocateOrRaise<BasicArrayIterator<E>>(context, result);
 		if (error) {
 			return error;
 		}
-		*result = Ptr(object);
+		error = __init__s_1tBasicArray_t1_Pt1_Pt1__V(context, *result, array, start, end);
+		if (error) {
+			return error;
+		}
 		return 0;
 	}
 

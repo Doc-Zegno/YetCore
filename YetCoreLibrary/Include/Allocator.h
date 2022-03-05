@@ -9,8 +9,8 @@ extern "C" {
 	YETCORELIBRARY_API intptr_t yet_allocatedCountR__get__V__I();
 }
 
-struct Allocator {
-	struct Options {
+namespace Allocator {
+	namespace Options {
 		/// <summary>
 		/// Indicates that a new place should not be cleared after allocation,
 		/// i.e., the returned memory block will contain random bytes.
@@ -19,7 +19,15 @@ struct Allocator {
 		/// in order to get rid of unnecessary zeroing
 		/// and thus increase a performance
 		/// </summary>
-		static const uintptr_t WITHOUT_ZEROING = 0x1;
+		constexpr uintptr_t WITHOUT_ZEROING = 0x1;
+
+		/// <summary>
+		/// Indicates that a new place is allowed to be allocated inside a so-called emergency pool.
+		/// Normally the allocator preserves some space for the sake of error handling
+		/// which must be available to perform even if there is no
+		/// free memory left in the regular pools
+		/// </summary>
+		constexpr uintptr_t CAN_USE_EMERGENCY_POOL = 0x2;
 
 		/// <summary>
 		/// Indicates that a new place can (and actually should) be allocated on the stack.
@@ -27,10 +35,8 @@ struct Allocator {
 		/// must be provided via the last argument of allocation method.
 		/// If the hint is <c>null</c>, this option is ignored
 		/// </summary>
-		static const uintptr_t CAN_USE_STACK = 0x2;
-	};
-
-	Allocator() = delete;
+		constexpr uintptr_t CAN_USE_STACK = 0x4;
+	}
 
 	/// <summary>
 	/// Allocate a contiguous block of dynamic memory of specified size.
@@ -42,12 +48,12 @@ struct Allocator {
 	/// option is not specified in a previous argument</param>
 	/// <returns>The pointer to allocated memory block if there is enough free space
 	/// and <c>null</c> otherwise</returns>
-	static void* allocate(uintptr_t size, uintptr_t options = 0, uintptr_t placeHint = 0) {
+	inline void* allocate(uintptr_t size, uintptr_t options = 0, uintptr_t placeHint = 0) {
 		return yet_allocateR__U_U_U__PV(size, options, placeHint);
 	}
 
 	template<typename T>
-	static void* allocate() {
+	inline void* allocate() {
 		return allocate(sizeof(T));
 	}
 
@@ -63,14 +69,14 @@ struct Allocator {
 	/// </note>
 	/// </summary>
 	/// <param name="object">Pointer to the block to be released</param>
-	static void deallocate(void* object) {
+	inline void deallocate(void* object) {
 		yet_deallocateR__PV__V(object);
 	}
 
 	/// <summary>
 	/// Get the total count of objects allocated (and not released yet) so far
 	/// </summary>
-	static intptr_t getAllocatedCount() {
+	inline intptr_t getAllocatedCount() {
 		return yet_allocatedCountR__get__V__I();
 	}
-};
+}
