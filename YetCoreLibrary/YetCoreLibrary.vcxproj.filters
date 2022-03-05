@@ -99,6 +99,9 @@
     <ClInclude Include="Include\FatPtrGuard.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\AllocatorUtil.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Iterator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\AllocatorUtil.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

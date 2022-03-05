@@ -8,6 +8,7 @@ namespace {
 }
 
 void* yet_allocateR__U_U_U__PV(uintptr_t size, uintptr_t options, uintptr_t placeHint) {
+	// TODO: implement path when emergency memory pool is used
 	// TODO: implement path when stack placement is used
 	// TODO: use custom memory manager
 	void* result;

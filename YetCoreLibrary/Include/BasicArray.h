@@ -5,7 +5,7 @@
 #include "Array.h"
 #include "FatPtr.h"
 #include "PtrGuard.h"
-#include "Allocator.h"
+#include "AllocatorUtil.h"
 #include "InvocationUtil.h"
 #include "BasicArrayIterator.h"
 
@@ -68,18 +68,20 @@ struct BasicArray {
 		}
 	}
 
-	static Ptr __init__PV__V(EC* context, void* object) {
-		auto self = new(object) BasicArray<E>;
+	static Ptr __init__s__V(EC* context, Ptr self) {
+		new((void*)self) BasicArray<E>;
 		return 0;
 	}
 
 	static Ptr __new__V__s(EC* context, Ptr* result) {
-		auto place = Allocator::allocate<BasicArray<E>>();
-		auto error = __init__PV__V(context, place);
+		auto error = Allocator::allocateOrRaise<BasicArray<E>>(context, result);
 		if (error) {
 			return error;
 		}
-		*result = Ptr(place);
+		error = __init__s__V(context, *result);
+		if (error) {
+			return error;
+		}
 		return 0;
 	}
 
