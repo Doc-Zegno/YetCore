@@ -4,12 +4,12 @@
 #include "Allocator.h"
 
 extern "C" {
-	YETCORELIBRARY_API Ptr yet_Allocator_raiseErrorF__U_U_U__PV(EC* context, uintptr_t size, uintptr_t options, uintptr_t placeHint);
+	YETCORELIBRARY_API Ptr yet_Allocator_raiseErrorF__U_U_U__N(EC* context, uintptr_t size, uintptr_t options, uintptr_t placeHint);
 }
 
 namespace Allocator {
 	inline Ptr raiseError(EC* context, uintptr_t size, uintptr_t options, uintptr_t placeHint) {
-		return yet_Allocator_raiseErrorF__U_U_U__PV(context, size, options, placeHint);
+		return yet_Allocator_raiseErrorF__U_U_U__N(context, size, options, placeHint);
 	}
 
 	inline Ptr allocateOrRaise(EC* context, uintptr_t size, uintptr_t options, Ptr* result) {
