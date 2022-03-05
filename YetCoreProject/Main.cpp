@@ -17,7 +17,7 @@
 #include "InvocationUtil.h"
 
 void* operator new(size_t size) {
-    return Allocator::allocate((uintptr_t)size, false, false);
+    return Allocator::allocate((uintptr_t)size);
 }
 
 void operator delete(void* object) {

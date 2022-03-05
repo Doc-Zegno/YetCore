@@ -9,4 +9,6 @@
 /// </summary>
 struct Manageable {
 	std::atomic<intptr_t> __refCount;
+
+	Manageable() : __refCount(1) {}
 };

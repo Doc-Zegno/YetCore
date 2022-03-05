@@ -12,9 +12,7 @@ struct BasicArrayIterator {
 	E* _current;
 	E* _end;
 
-	BasicArrayIterator(Ptr array, E* start, E* end) : _array(array, true), _current(start), _end(end) {
-		__base.__type = &__typeHolder.type;
-	}
+	BasicArrayIterator(Ptr array, E* start, E* end) : __base(&__typeHolder.type), _array(array, true), _current(start), _end(end) {}
 
 	static Ptr hasNextF__get__s__B(EC* context, Ptr self, bool* result) {
 		auto iterator = (BasicArrayIterator<E>*)self;

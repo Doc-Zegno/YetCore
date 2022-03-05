@@ -14,6 +14,8 @@ struct BasicArray {
 	Any __base;
 	std::vector<E> _elements;
 
+	BasicArray() : __base(&__typeHolder.type) {}
+
 	static Ptr iteratorF__get__s__1tIterator_t1(EC* context, Ptr self, Ptr* result) {
 		auto basicArray = (BasicArray<E>*)self;
 		auto& elements = basicArray->_elements;
@@ -68,7 +70,6 @@ struct BasicArray {
 
 	static Ptr __init__PV__V(EC* context, void* object) {
 		auto self = new(object) BasicArray<E>;
-		self->__base.__type = &__typeHolder.type;
 		return 0;
 	}
 

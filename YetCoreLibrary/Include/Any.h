@@ -12,6 +12,8 @@ struct Any {
 	Manageable __manageable;  // NOTE: you can't derive from this without losing a standard layout
 	Type* __type;
 
+	Any(Type* type) : __type(type) {}
+
 	struct __Methods {
 		struct Indices {
 			enum {
