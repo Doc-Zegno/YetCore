@@ -3,14 +3,16 @@
 #include "Api.h"
 #include "Manageable.h"
 
-extern "C" {
-	YETCORELIBRARY_API void* yet_allocateR__U_U_U__PV(uintptr_t size, uintptr_t options, uintptr_t placeHint);
-	YETCORELIBRARY_API void yet_deallocateR__PV__V(void* object);
-	YETCORELIBRARY_API intptr_t yet_allocatedCountR__get__V__I();
-}
-
 namespace Allocator {
-	namespace Options {
+	struct Options {
+		static const uintptr_t IS_ZEROING_DISABLED = 0x1;
+		static const uintptr_t CAN_USE_EMERGENCY_POOL = 0x2;
+
+		uintptr_t _bitSet = 0;
+		uintptr_t _placeHint = 0;
+
+		Options() {}
+
 		/// <summary>
 		/// Indicates that a new place should not be cleared after allocation,
 		/// i.e., the returned memory block will contain random bytes.
@@ -19,7 +21,9 @@ namespace Allocator {
 		/// in order to get rid of unnecessary zeroing
 		/// and thus increase a performance
 		/// </summary>
-		constexpr uintptr_t WITHOUT_ZEROING = 0x1;
+		bool isZeroingDisabled() {
+			return _bitSet & IS_ZEROING_DISABLED;
+		}
 
 		/// <summary>
 		/// Indicates that a new place is allowed to be allocated inside a so-called emergency pool.
@@ -27,29 +31,56 @@ namespace Allocator {
 		/// which must be available to perform even if there is no
 		/// free memory left in the regular pools
 		/// </summary>
-		constexpr uintptr_t CAN_USE_EMERGENCY_POOL = 0x2;
+		bool canUseEmergencyPool() {
+			return _bitSet & CAN_USE_EMERGENCY_POOL;
+		}
 
 		/// <summary>
-		/// Indicates that a new place can (and actually should) be allocated on the stack.
-		/// The hint about a stack location which is safe to use for this purpose
-		/// must be provided via the last argument of allocation method.
-		/// If the hint is <c>null</c>, this option is ignored
+		/// Get the hint about a stack location which is safe to use for a "fast" memory allocation.
+		/// This might be useful in case of the allocation of so-called "local" objects
+		/// which are semantically equivalent to automatic stack variables.
+		/// If the hint equals to zero, it must be ignored
 		/// </summary>
-		constexpr uintptr_t CAN_USE_STACK = 0x4;
-	}
+		uintptr_t getPlaceHint() {
+			return _placeHint;
+		}
 
+		Options withZeroingDisabled() const {
+			auto copy = *this;
+			copy._bitSet |= IS_ZEROING_DISABLED;
+			return copy;
+		}
+
+		Options withCanUseEmergencyPool() const {
+			auto copy = *this;
+			copy._bitSet |= CAN_USE_EMERGENCY_POOL;
+			return copy;
+		}
+
+		Options withPlaceHint(uintptr_t placeHint) const {
+			auto copy = *this;
+			copy._placeHint = placeHint;
+			return copy;
+		}
+	};
+}
+
+extern "C" {
+	YETCORELIBRARY_API void* yet_Allocator_allocateR__U_2p1c_Options__PV(uintptr_t size, Allocator::Options* options);
+	YETCORELIBRARY_API void yet_Allocator_deallocateR__PV__V(void* object);
+	YETCORELIBRARY_API intptr_t yet_Allocator_allocatedCountR__get__V__I();
+}
+
+namespace Allocator {
 	/// <summary>
 	/// Allocate a contiguous block of dynamic memory of specified size.
 	/// </summary>
 	/// <param name="size">Required size of block (in bytes)</param>
 	/// <param name="options">Allocation options. For available ones see <see cref="Options"/></param>
-	/// <param name="placeHint">The hint about the place where the memory should be allocated.
-	/// This hint is ignored when either it equals to zero or <see cref="CAN_USE_STACK"/>
-	/// option is not specified in a previous argument</param>
 	/// <returns>The pointer to allocated memory block if there is enough free space
 	/// and <c>null</c> otherwise</returns>
-	inline void* allocate(uintptr_t size, uintptr_t options = 0, uintptr_t placeHint = 0) {
-		return yet_allocateR__U_U_U__PV(size, options, placeHint);
+	inline void* allocate(uintptr_t size, Options* options = nullptr) {
+		return yet_Allocator_allocateR__U_2p1c_Options__PV(size, options);
 	}
 
 	/// <summary>
@@ -76,13 +107,13 @@ namespace Allocator {
 	/// </summary>
 	/// <param name="object">Pointer to the block to be released</param>
 	inline void deallocate(void* object) {
-		yet_deallocateR__PV__V(object);
+		yet_Allocator_deallocateR__PV__V(object);
 	}
 
 	/// <summary>
 	/// Get the total count of objects allocated (and not released yet) so far
 	/// </summary>
 	inline intptr_t getAllocatedCount() {
-		return yet_allocatedCountR__get__V__I();
+		return yet_Allocator_allocatedCountR__get__V__I();
 	}
 }

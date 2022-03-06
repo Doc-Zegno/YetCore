@@ -15,7 +15,7 @@ YETCORELIBRARY_API bool yet_Ptr_releaseR__s__V(Ptr object) {
 		if (deinit != nullptr) {
 			deinit(object);
 		}
-		yet_deallocateR__PV__V(any);
+		Allocator::deallocate(any);
 		return true;
 	} else {
 		return false;
