@@ -52,6 +52,12 @@ namespace Allocator {
 		return yet_allocateR__U_U_U__PV(size, options, placeHint);
 	}
 
+	/// <summary>
+	/// Allocate a contiguous block of dynamic memory of size enough for an object of specified type.
+	/// </summary>
+	/// <typeparam name="T">The type of object which the memory is being allocated for</typeparam>
+	/// <returns>The pointer to allocated memory block if there is enough free space
+	/// and <c>null</c> otherwise</returns>
 	template<typename T>
 	inline void* allocate() {
 		return allocate(sizeof(T));
