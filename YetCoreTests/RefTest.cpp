@@ -95,11 +95,11 @@ namespace YetCoreTests {
 
 		TEST_METHOD(BasicArrayNested) {
 			runWithMemoryCheck([] {
-				Ptr ptr;
+				Ptr ptr = 0;
 				BasicArray<Ref>::__new__V__s(nullptr, &ptr);
 				auto ref = protect(ptr);
 				for (auto i = 0; i < 6; i++) {
-					Ptr nestedPtr;
+					Ptr nestedPtr = 0;
 					auto result = BasicArray<Ref>::__new__V__s(nullptr, &nestedPtr);
 					auto nestedRef = protect(nestedPtr);
 					BasicArray<Ref>::addF__s_t1__V(nullptr, ptr, nestedRef);

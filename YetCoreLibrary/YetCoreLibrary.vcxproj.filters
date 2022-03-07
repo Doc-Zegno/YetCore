@@ -102,6 +102,9 @@
     <ClInclude Include="Include\AllocatorUtil.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\StackBuffer.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

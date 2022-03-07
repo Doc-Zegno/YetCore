@@ -3,6 +3,8 @@
 #include <utility>
 
 #include "PtrX.h"
+#include "Allocator.h"
+#include "StackBuffer.h"
 
 /// <summary>
 /// A thin wrapper around <c>Ptr</c> which enables automatic release on leaving its scope.
@@ -30,6 +32,11 @@ struct PtrGuard {
 	Ptr ptr;
 
 	PtrGuard() : ptr(0) {}
+
+	template<size_t SIZE>
+	PtrGuard(StackBuffer<SIZE>* buffer) {
+		ptr = Allocator::PlaceHint(buffer, SIZE).getValue();
+	}
 
 	PtrGuard(const PtrGuard& other) = delete;
 

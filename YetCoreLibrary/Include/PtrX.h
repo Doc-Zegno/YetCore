@@ -3,8 +3,24 @@
 #include "Ptr.h"
 #include "Any.h"
 
+namespace PtrTags {
+	constexpr Ptr NO_TAG = 0;
+	constexpr Ptr ON_STACK = 15;
+
+	constexpr Ptr TAG_MASK = 0xf;  // Allocated objects must be aligned at the boundary of 16 bytes
+	constexpr Ptr LAST_TAG_WITH_DEALLOCATION = NO_TAG;  // Inclusive
+}
+
+inline Ptr getTag(Ptr object) {
+	return object & PtrTags::TAG_MASK;
+}
+
+inline Ptr removeTag(Ptr object) {
+	return object & ~PtrTags::TAG_MASK;
+}
+
 inline Type* getType(Ptr object) {
-	auto any = (Any*)object;
+	auto any = (Any*)removeTag(object);
 	return any->__type;
 }
 

@@ -180,6 +180,7 @@
     <ClInclude Include="Include\PtrGuard.h" />
     <ClInclude Include="Include\PtrX.h" />
     <ClInclude Include="Include\Ref.h" />
+    <ClInclude Include="Include\StackBuffer.h" />
     <ClInclude Include="Include\StackFrame.h" />
     <ClInclude Include="Include\Type.h" />
     <ClInclude Include="Include\VirtualTable.h" />

@@ -9,8 +9,17 @@ namespace {
 
 void* yet_Allocator_allocateR__U_2p1c_Options__PV(uintptr_t size, Allocator::Options* options) {
 	// TODO: implement path when emergency memory pool is used
-	// TODO: implement path when stack placement is used
 	// TODO: use custom memory manager
+
+	// Fast path: try to use a stack placement
+	if (options != nullptr) {
+		auto placeHint = options->getPlaceHint();
+		if (placeHint.getSize() >= size) {  // Returns 0 if no hint is available which is totally fine
+			return placeHint.getPlace();
+		}
+	}
+
+	// Slow path: allocate memory on a heap
 	void* result;
 	if (options != nullptr && options->isZeroingDisabled()) {
 		result = malloc((size_t)size);

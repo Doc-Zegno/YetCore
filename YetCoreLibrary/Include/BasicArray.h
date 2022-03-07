@@ -17,7 +17,7 @@ struct BasicArray {
 	BasicArray() : __base(&__typeHolder.type) {}
 
 	static Ptr iteratorF__get__s__1tIterator_t1(EC* context, Ptr self, Ptr* result) {
-		auto basicArray = (BasicArray<E>*)self;
+		auto basicArray = (BasicArray<E>*)removeTag(self);
 		auto& elements = basicArray->_elements;
 		E* start;
 		E* end;
@@ -37,7 +37,7 @@ struct BasicArray {
 		if (fragmentCount < 1) {
 			return -1;
 		}
-		auto basicArray = (BasicArray<E>*)self;
+		auto basicArray = (BasicArray<E>*)removeTag(self);
 		auto& elements = basicArray->_elements;
 		fragments->length = intptr_t(elements.size());
 		fragments->start = const_cast<E*>(elements.data());
@@ -45,19 +45,19 @@ struct BasicArray {
 	}
 
 	static Ptr countF__get__s__I(EC* context, Ptr self, intptr_t* result) {
-		auto basicArray = (BasicArray<E>*)self;
+		auto basicArray = (BasicArray<E>*)removeTag(self);
 		*result = intptr_t(basicArray->_elements.size());
 		return 0;
 	}
 
 	static Ptr addF__s_t1__V(EC* context, Ptr self, E element) {
-		auto basicArray = (BasicArray<E>*)self;
+		auto basicArray = (BasicArray<E>*)removeTag(self);
 		basicArray->_elements.push_back(element);
 		return 0;
 	}
 
 	static Ptr getF__operator__s_I__t1(EC* context, Ptr self, int index, YET_RES_TYPE(E)* result) {
-		auto basicArray = (BasicArray<E>*)self;
+		auto basicArray = (BasicArray<E>*)removeTag(self);
 		auto& elements = basicArray->_elements;
 		if (index >= 0 && index < int(elements.size())) {
 			assign(result, elements[index]);
@@ -69,7 +69,7 @@ struct BasicArray {
 	}
 
 	static Ptr __init__s__V(EC* context, Ptr self) {
-		new((void*)self) BasicArray<E>;
+		new((void*)removeTag(self)) BasicArray<E>;
 		return 0;
 	}
 
@@ -95,7 +95,7 @@ struct BasicArray {
 	}
 
 	static void __deinit(Ptr self) {
-		auto basicArray = (BasicArray<E>*)self;
+		auto basicArray = (BasicArray<E>*)removeTag(self);
 		basicArray->~BasicArray<E>();
 	}
 

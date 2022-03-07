@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "PtrX.h"
 #include "AllocatorUtil.h"
 
 namespace Allocator {
@@ -28,10 +29,15 @@ YETCORELIBRARY_API Ptr yet_Allocator_allocateOrRaiseF__U_2p1c_Options__R(EC* con
 	if (options == nullptr) {
 		options = &Allocator::DEFAULT_OPTIONS;
 	}
-	auto optionsWithHint = options->withPlaceHint(*result);
+	auto hint = Allocator::PlaceHint(*result);
+	auto optionsWithHint = options->withPlaceHint(hint);
 	auto place = allocate(size, &optionsWithHint);
 	if (place != nullptr) {
-		*result = Ptr(place);
+		auto ptr = Ptr(place);
+		if (place == hint.getPlace()) {
+			ptr |= PtrTags::ON_STACK;
+		}
+		*result = ptr;
 		return 0;
 	} else {
 		return Allocator::raiseError(context, size, &optionsWithHint);
