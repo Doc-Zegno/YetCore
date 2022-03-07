@@ -515,16 +515,24 @@ The common examples of functions with the reduced calling conventions are:
 
 **Note:** you may want to think that such functions cannot fail.
 Well, it's not true in general. Obviously, the allocator *can* fail if
-the system has run out of available memory. But it's totally fine because
-you cannot do anything with such an error. In fact, the program will
-**terminate** immediately when there is no memory left. Absolutely the same
-is true for any other reduced function: the runtime guarantees that program
-will terminate if it fails.
+the system has run out of available memory. But instead of raising an error
+it will silently return a `null` pointer, so it is the responsibility
+of the caller side to check for it and decide whether to treat it as an error
+or not.
+
+Some other reduced functions might use different approaches for the handling
+of abnormal situations (from totally ignoring them to the immediate termination
+of a program), so make sure to consult the documentation of a reduced function
+before using it.
 
 So the moral of this fable is the following: a function uses reduced
-calling convention if and only if it's guaranteed to produce
-**unrecoverable errors only**, i.e. when it's not possible to continue
-the program's execution.
+calling convention only in two cases:
+ 1. if it's not possible to use any other convention (e.g., deinitializer)
+ 2. if it's guaranteed to produce **unrecoverable errors only**,
+    i.e., when it's not possible to continue the program's execution
+
+When writing your own API, please, consider using a standard functional
+calling convention wherever it's possible.
 
 #### Dealing with generic functions
 Since generic functions can expect arguments of some unknown type `T`
@@ -587,6 +595,21 @@ are used for optimization purposes only and very risky if you don't know
 when it's safe to enable such an optimization (consider reading
 a dedicated section below).
 
+#### Allocation options
+Under the hood the allocator uses a one-for-all method `allocate(size:options:)`
+which behavior is controlled with its second argument of type `Allocator::Options`.
+These options can be used to specify a preferred allocation *mode*:
+ 1. *Standard* if no options are passed
+ 2. *Emergent* if objects representing information about some error are created
+ 3. *Permanent* if objects are not supposed to be deallocated until
+    the program is terminated (e.g., singletons)
+ 4. *Stack* if objects effectively have the semantics of automatic variables. 
+
+It's possible to specify additional features as well:
+ * Whether to zero the allocated memory block or not. It might be useful
+   for the sake of performance if the caller side is going to initialize
+   the obtained block's contents anyway.
+
 #### Stack allocation
 One of the main problems is a reduction of unnecessary memory allocations
 on a process' heap since they're rather expensive. Actually there are
@@ -601,7 +624,46 @@ the following requirements:
     * or corresponding function argument is marked as local itself.
 
 If you have managed to prove your object is local, it can be allocated
-*on stack* with a dedicated allocator's method.
+*on stack* with a dedicated allocator's option `PlaceHint` which must
+contain information about the place on stack which is safe to use
+for such a purpose, usually it's done with the help of `StackBuffer` instances
+which ensure both a proper data-alignment (16-byte for 64-bit machines)
+and a zeroing of its contents right during a construction:
+```cpp
+    StackBuffer<64> buffer;  // Some reasonable size, 64 bytes must be enough
+    auto hint = Allocator::PlaceHint(&buffer, 64);  // Tell buffer's address and size
+    auto options = Allocator::Options().withPlaceHint(hint);
+    auto allocatedPlace = Allocator::allocate(size, &options);
+    assert(allocatedPlace == &buffer);
+```
+Whilst the idea behind it is pretty simple, there is still a lot of boilerplate
+code to write. The good news are there is a handy specialization of `allocate`
+method named `allocateOrRaise` which follows the standard calling convention
+thus it returns the address of allocated block via the last argument:
+```cpp
+    // Returns OutOfMemoryError if no free memory left and 0 on success
+    Ptr allocateOrRaise(EC* context, UInt size, Ptr* result);
+```
+This specialization assumes that a place hint is passed via the same last argument
+(it became possible since both `Ptr` and `PlaceHint` occupies 8 bytes of memory).
+Recall that it's necessary to zero the resulting `Ptr` before a function invokation,
+that's exactly because of this assumption, more exactly, 0 means no place hint.
+
+To make use of this fact, you can instruct a `PtrGuard` to properly initialize
+a guarded `Ptr` by passing a pointer to the `StackBuffer` to its ctor:
+```cpp
+    StackBuffer<64> buffer;
+    PtrGuard guard(&buffer);  // Now `guard.ptr` contains a hint
+    auto error = Allocator::allocateOrRaise(context, size, &guard.ptr); 
+```
+What's more, almost all the library code is written to use this allocation method.
+So if you want, for example, to locally instantiate an array, all you need
+is to specify a target `StackBuffer`:
+```cpp
+    StackBuffer<64> buffer;
+    PtrGuard guard(&buffer);
+    BasicArray<int>::__new__V__s(nullptr, &guard.ptr);
+```
 
 
 ### Object's memory layout
