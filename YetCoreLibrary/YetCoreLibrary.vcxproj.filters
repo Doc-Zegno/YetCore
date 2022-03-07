@@ -105,6 +105,9 @@
     <ClInclude Include="Include\StackBuffer.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Primitives.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
