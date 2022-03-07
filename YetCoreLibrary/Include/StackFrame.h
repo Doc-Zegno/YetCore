@@ -15,7 +15,7 @@ struct StackFrame {
 
 	StackFrame(ExecutionContext*& context, const char* functionName) : functionName(functionName) {
 		if (context == nullptr) {
-			context = yet_ExecutionContext_currentR__get__V__PV();
+			context = ExecutionContext::getCurrent();
 		}
 		this->context = context;
 		previous = context->current;
