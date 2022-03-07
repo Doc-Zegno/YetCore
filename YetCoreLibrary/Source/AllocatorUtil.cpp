@@ -31,7 +31,7 @@ YETCORELIBRARY_API Ptr yet_Allocator_allocateOrRaiseF__U_2p1c_Options__R(EC* con
 	}
 	auto hint = Allocator::PlaceHint(*result);
 	auto optionsWithHint = options->withPlaceHint(hint);
-	auto place = allocate(size, &optionsWithHint);
+	auto place = Allocator::allocate(size, &optionsWithHint);
 	if (place != nullptr) {
 		auto ptr = Ptr(place);
 		if (place == hint.getPlace()) {

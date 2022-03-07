@@ -1,5 +1,5 @@
 #pragma once
 
-#include <cstdint>
+#include "Primitives.h"
 
-using Ptr = uintptr_t;
+using Ptr = UInt;

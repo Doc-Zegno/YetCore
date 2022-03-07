@@ -15,13 +15,13 @@ struct BasicArrayIterator {
 	BasicArrayIterator(Ptr array, E* start, E* end) : __base(&__typeHolder.type), _array(array, true), _current(start), _end(end) {}
 
 	static Ptr hasNextF__get__s__B(EC* context, Ptr self, bool* result) {
-		auto iterator = (BasicArrayIterator<E>*)removeTag(self);
+		auto iterator = as<BasicArrayIterator<E>>(self);
 		*result = iterator->_current < iterator->_end;
 		return 0;
 	}
 
 	static Ptr nextF__get__s__t1(EC* context, Ptr self, YET_RES_TYPE(E)* result) {
-		auto iterator = (BasicArrayIterator<E>*)removeTag(self);
+		auto iterator = as<BasicArrayIterator<E>>(self);
 		auto current = iterator->_current;
 		if (current < iterator->_end) {
 			assign(result, *current);
@@ -34,7 +34,7 @@ struct BasicArrayIterator {
 	}
 
 	static Ptr __init__s_1tBasicArray_t1_Pt1_Pt1__V(EC* context, Ptr self, Ptr array, E* start, E* end) {
-		new((void*)removeTag(self)) BasicArrayIterator<E>(array, start, end);
+		new(as<void>(self)) BasicArrayIterator<E>(array, start, end);
 		return 0;
 	}
 
@@ -51,7 +51,7 @@ struct BasicArrayIterator {
 	}
 
 	static void __deinit(Ptr self) {
-		auto iterator = (BasicArrayIterator<E>*)removeTag(self);
+		auto iterator = as<BasicArrayIterator<E>>(self);
 		iterator->~BasicArrayIterator<E>();
 	}
 

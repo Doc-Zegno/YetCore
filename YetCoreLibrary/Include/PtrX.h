@@ -19,8 +19,26 @@ inline Ptr removeTag(Ptr object) {
 	return object & ~PtrTags::TAG_MASK;
 }
 
+/// <summary>
+/// Get an address of allocated block which a given pointer refers to.
+/// This method effectively removes the tag from the pointer
+/// and interpreters what's left as a C-pointer.
+/// <note type="caution">
+/// This method mustn't be called on pointers which actually
+/// don't refer to any allocated memory area, e.g.,
+/// embedded strings, integers and so on.
+/// </note>
+/// </summary>
+/// <typeparam name="T">The type of object a given pointer refers to</typeparam>
+/// <param name="object">The (possibly tagged) pointer to the object of type <c>T</c></param>
+/// <returns>A casted C-pointer to allocated object without any tags</returns>
+template<typename T>
+T* as(Ptr object) {
+	return (T*)removeTag(object);
+}
+
 inline Type* getType(Ptr object) {
-	auto any = (Any*)removeTag(object);
+	auto any = as<Any>(object);
 	return any->__type;
 }
 
@@ -32,7 +50,7 @@ inline FunctionPtr* findTableOf(Ptr object) {
 
 extern "C" {
 	YETCORELIBRARY_API void yet_Ptr_retainR__s__V(Ptr object);
-	YETCORELIBRARY_API bool yet_Ptr_releaseR__s__V(Ptr object);
+	YETCORELIBRARY_API bool yet_Ptr_releaseR__s__B(Ptr object);
 }
 
 /// <summary>
@@ -49,5 +67,5 @@ inline void retain(Ptr object) {
 /// <param name="object">(NOT NULL)</param>
 /// <returns><code>true</code> if object was deallocated and <code>false</code> otherwise</returns>
 inline bool release(Ptr object) {
-	return yet_Ptr_releaseR__s__V(object);
+	return yet_Ptr_releaseR__s__B(object);
 }

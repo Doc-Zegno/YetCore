@@ -5,14 +5,14 @@
 YETCORELIBRARY_API void yet_Ptr_retainR__s__V(Ptr object) {
 	// TODO: check against tags when they will be introduced
 	// TODO: check for null for the sake of robustness
-	auto any = (Any*)removeTag(object);
+	auto any = as<Any>(object);
 	any->__manageable.__refCount++;
 }
 
-YETCORELIBRARY_API bool yet_Ptr_releaseR__s__V(Ptr object) {
+YETCORELIBRARY_API bool yet_Ptr_releaseR__s__B(Ptr object) {
 	// TODO: check against tags when they will be introduced
 	// TODO: check for null for the sake of robustness
-	auto any = (Any*)removeTag(object);
+	auto any = as<Any>(object);
 	auto refCount = --any->__manageable.__refCount;
 	if (refCount == 0) {
 		auto deinit = any->__type->deinit;
