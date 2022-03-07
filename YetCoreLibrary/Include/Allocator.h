@@ -4,12 +4,66 @@
 #include "Manageable.h"
 
 namespace Allocator {
+	/// <summary>
+	/// A hint indicating that it is safe to allocate a requested memory block on stack.
+	/// This is usually accomplished by placing an empty zero buffer on stack.
+	/// If this buffer is large enough, it must be used for an allocation
+	/// </summary>
+	struct PlaceHint {
+		static const uintptr_t TAG_MASK = 0xf;
+
+		uintptr_t _value = 0;
+
+		PlaceHint() {}
+
+		explicit PlaceHint(uintptr_t value) : _value(value) {}
+
+		/// <summary>
+		/// Construct a hint for the stack buffer with specified features
+		/// </summary>
+		/// <param name="place">The address of stack buffer</param>
+		/// <param name="size">The size of stack buffer</param>
+		PlaceHint(void* place, uintptr_t size) {
+			if (place != nullptr) {
+				if ((uintptr_t(place) & TAG_MASK) == 0U) {  // Check the data alignment for the sake of robustness
+					auto tag = size >> 4U;  // Data is aligned at the boundary of 16 bytes
+					if (tag <= TAG_MASK) {
+						_value = uintptr_t(place) | tag;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Get a compressed internal representation of this hint
+		/// </summary>
+		uintptr_t getValue() const {
+			return _value;
+		}
+
+		/// <summary>
+		/// Get the size of stack buffer (in bytes) which can be used for an allocation
+		/// or <c>0</c> if the hint is invalid
+		/// </summary>
+		uintptr_t getSize() const {
+			return (_value & TAG_MASK) << 4U;
+		}
+
+		/// <summary>
+		/// Get the address of stack buffer which can be used for an allocation
+		/// or <c>nullptr</c> if the hint is invalid
+		/// </summary>
+		void* getPlace() const {
+			return (void*)(_value & ~TAG_MASK);
+		}
+	};
+
 	struct Options {
 		static const uintptr_t IS_ZEROING_DISABLED = 0x1;
 		static const uintptr_t CAN_USE_EMERGENCY_POOL = 0x2;
 
 		uintptr_t _bitSet = 0;
-		uintptr_t _placeHint = 0;
+		PlaceHint _placeHint;
 
 		Options() {}
 
@@ -41,7 +95,7 @@ namespace Allocator {
 		/// which are semantically equivalent to automatic stack variables.
 		/// If the hint equals to zero, it must be ignored
 		/// </summary>
-		uintptr_t getPlaceHint() {
+		PlaceHint getPlaceHint() {
 			return _placeHint;
 		}
 
@@ -57,7 +111,7 @@ namespace Allocator {
 			return copy;
 		}
 
-		Options withPlaceHint(uintptr_t placeHint) const {
+		Options withPlaceHint(PlaceHint placeHint) const {
 			auto copy = *this;
 			copy._placeHint = placeHint;
 			return copy;
