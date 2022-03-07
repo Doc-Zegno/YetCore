@@ -37,20 +37,54 @@ T* as(Ptr object) {
 	return (T*)removeTag(object);
 }
 
-inline Type* getType(Ptr object) {
-	auto any = as<Any>(object);
-	return any->__type;
-}
-
-template<typename T>
-inline FunctionPtr* findTableOf(Ptr object) {
-	auto type = getType(object);
-	return type->findTableOf(typeOf<T>());
-}
-
 extern "C" {
 	YETCORELIBRARY_API void yet_Ptr_retainR__s__V(Ptr object);
 	YETCORELIBRARY_API bool yet_Ptr_releaseR__s__B(Ptr object);
+	YETCORELIBRARY_API Type* yet_Ptr_typeR__get__s__1tPointer_Type(Ptr object);
+	YETCORELIBRARY_API FunctionPtr* yet_Ptr_findTableOfR__s_Type__PPV(Ptr object, Type* type);
+}
+
+/// <summary>
+/// Get the type of the object a given pointer refers to.
+/// Must return correct type for the special cases
+/// like embedded strings, integers and so on.
+/// </summary>
+/// <param name="object">The pointer to an object</param>
+/// <returns>The type of object. Technically it's not guaranteed to be not <c>null</c>
+/// since nothing stops 3rd party plugin writers from passing pointers
+/// to objects with invalid memory layout. It's up to the caller
+/// side to raise error in such a case</returns>
+inline Type* getType(Ptr object) {
+	return yet_Ptr_typeR__get__s__1tPointer_Type(object);
+}
+
+/// <summary>
+/// Find the virtual table implementing a specified type from a given object.
+/// Must return correct virtual table for the special cases
+/// like embedded strings, integers and so on.
+/// </summary>
+/// <param name="object">The pointer to an object</param>
+/// <param name="type">The type of virtual table</param>
+/// <returns>The address of array of functions from a requested virtual table
+/// if the given object implements the specified type,
+/// and <c>null</c> otherwise</returns>
+inline FunctionPtr* findTableOf(Ptr object, Type* type) {
+	return yet_Ptr_findTableOfR__s_Type__PPV(object, type);
+}
+
+/// <summary>
+/// Find the virtual table implementing a specified type from a given object.
+/// Must return correct virtual table for the special cases
+/// like embedded strings, integers and so on.
+/// </summary>
+/// <typeparam name="T">The type of virtual table</typeparam>
+/// <param name="object">The pointer to an object</param>
+/// <returns>The address of array of functions from a requested virtual table
+/// if the given object implements the specified type,
+/// and <c>null</c> otherwise</returns>
+template<typename T>
+inline FunctionPtr* findTableOf(Ptr object) {
+	return findTableOf(object, typeOf<T>());
 }
 
 /// <summary>
